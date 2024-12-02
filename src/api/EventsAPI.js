@@ -5,13 +5,22 @@ import BaseAPI from "./BaseAPI";
  *
  */
 class EventsAPI extends BaseAPI {
+  static async create(data) {
+    await this.request({
+      path: `events`,
+      data,
+      method: "post",
+    });
+  }
+
   static async get(id) {
     const res = await this.request({ path: `events/${id}` });
     return res.data;
   }
 
-  static async getAll() {
-    const res = await this.request({ path: `events` });
+  static async getAll({ showAttendingEvents = false, showFavorites = false } = {}) {
+    const query = new URLSearchParams({ showAttendingEvents, showFavorites });
+    const res = await this.request({ path: `events?${query.toString()}` });
     return res.data;
   }
 
@@ -30,23 +39,38 @@ class EventsAPI extends BaseAPI {
       method: "delete",
     });
   }
-  
+
+  // attend // POST events/:id/attendance
+  static async attend(eventId) {
+    await this.request({
+      path: `events/${eventId}/attendance`,
+      method: "post",
+    });
+  }
+
+  // unattend // DELETE events/:id/attendance
+  static async unattend(eventId) {
+    await this.request({
+      path: `events/${eventId}/attendance`,
+      method: "delete",
+    });
+  }
+
   // addFavorite // POST events/:id/favorite
   static async makeFav(eventId) {
-    const res = await this.request({
+    await this.request({
       path: `events/${eventId}/favorite`,
       method: "post",
     });
-    return res.data;
   }
 
-  // removerFavorite // DELETE events/:id/favorite
+  // removeFavorite // DELETE events/:id/favorite
   static async removeFav(eventId) {
     await this.request({
       path: `events/${eventId}/favorite`,
       method: "delete",
     });
-}
+  }
 }
 
 export default EventsAPI;

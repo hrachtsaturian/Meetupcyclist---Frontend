@@ -1,39 +1,32 @@
 import React, { useContext, useEffect, useState } from "react";
-import EventsAPI from "../../api/EventsAPI";
+import GroupsAPI from "../../api/GroupsAPI";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, FormGroup, Label, Input, Button, Col } from "reactstrap";
-import DatePicker from "react-datepicker";
 import Context from "../Context";
-import Loader from "../Loader";
 
-const EventEdit = () => {
+const GroupEdit = () => {
   const { id } = useParams();
   const { currentUser } = useContext(Context);
 
   const [formData, setFormData] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState();
   const navigate = useNavigate();
 
-  // first, find the event data
+  // first, find the group data
   useEffect(() => {
     async function getData() {
       try {
-        const { title, description, date, location, createdBy } =
-          await EventsAPI.get(id);
+        const { name, description, createdBy } = await GroupsAPI.get(id);
 
         if (currentUser.id !== createdBy) {
           navigate("/");
         }
 
         setFormData({
-          title,
-          description,
-          date,
-          location,
+          name,
+          description
         });
-        setIsLoading(false);
       } catch (error) {
         setError(error);
       }
@@ -52,32 +45,28 @@ const EventEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await EventsAPI.update(id, formData);
-      navigate(`/events/${id}`);
+      await GroupsAPI.update(id, formData);
+      navigate(`/groups/${id}`);
     } catch (error) {
-      setError(error || "Failed to update event");
+      setError(error || "Failed to update group");
       setIsSuccess(false);
     }
   };
 
-  if (!isLoading) {
-    return <Loader />;
-  }
-
   return (
     <Form onSubmit={handleSubmit}>
-      <h3 className="text-center mb-4">Event Update</h3>
+      <h3 className="text-center mb-4">Group Update</h3>
       <FormGroup row>
-        <Label for="exampleTitle" sm={2}>
-          Title
+        <Label for="exampleName" sm={2}>
+          Name
         </Label>
         <Col sm={10}>
           <Input
-            id="exampleTitle"
-            name="title"
-            placeholder="title"
+            id="exampleName"
+            name="name"
+            placeholder="name"
             type="text"
-            value={formData.title}
+            value={formData.name}
             onChange={handleChange}
           />
         </Col>
@@ -94,38 +83,6 @@ const EventEdit = () => {
             type="text"
             value={formData.description}
             onChange={handleChange}
-          />
-        </Col>
-      </FormGroup>
-      <FormGroup row>
-        <Label for="exampleLocation" sm={2}>
-          Location
-        </Label>
-        <Col sm={10}>
-          <Input
-            id="exampleLocation"
-            name="location"
-            placeholder="location"
-            type="text"
-            value={formData.location}
-            onChange={handleChange}
-          />
-        </Col>
-      </FormGroup>
-      <FormGroup row>
-        <Label for="exampleDate" sm={2}>
-          Date
-        </Label>
-        <Col sm={2}>
-          <DatePicker
-            id="datePicker"
-            selected={formData.date ? new Date(formData.date) : null}
-            onChange={(date) =>
-              handleChange({ target: { name: "date", value: date } })
-            }
-            showTimeSelect
-            dateFormat="Pp"
-            className="form-control"
           />
         </Col>
       </FormGroup>
@@ -153,4 +110,4 @@ const EventEdit = () => {
   );
 };
 
-export default EventEdit;
+export default GroupEdit;

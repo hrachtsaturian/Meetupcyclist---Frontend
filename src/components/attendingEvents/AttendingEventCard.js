@@ -10,7 +10,8 @@ import {
 } from "reactstrap";
 import { formatData } from "../../helpers/helpers";
 
-const FavoriteRow = ({ favorite }) => {
+// TODO: use tag on card!!
+const AttendingEventCard = ({ attendingEvent }) => {
   return (
     <Link to="/something">
       <Card
@@ -20,11 +21,11 @@ const FavoriteRow = ({ favorite }) => {
       >
         <img alt="Sample" src="https://picsum.photos/300/200" />
         <CardBody>
-          <CardTitle tag="h5">{favorite.title}</CardTitle>
+          <CardTitle tag="h5">{attendingEvent.title}</CardTitle>
           <CardSubtitle className="mb-2 text-muted" tag="h6">
-            {formatData(favorite.date)}
+            {formatData(attendingEvent.date)}
           </CardSubtitle>
-          <CardText>{favorite.description}</CardText>
+          <CardText>{attendingEvent.description}</CardText>
           <Button>Button</Button>
         </CardBody>
       </Card>
@@ -32,4 +33,4 @@ const FavoriteRow = ({ favorite }) => {
   );
 };
 
-export default FavoriteRow;
+export default AttendingEventCard;
