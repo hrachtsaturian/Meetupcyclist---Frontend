@@ -114,7 +114,7 @@ const Signup = ({ login }) => {
               id="exampleText"
               name="bio"
               type="textarea"
-              placeholder="tell us something about yourself"
+              placeholder="tell us about yourself"
               onChange={handleChange}
             />
           </Col>

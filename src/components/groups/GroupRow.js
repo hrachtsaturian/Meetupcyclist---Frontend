@@ -1,13 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Card, CardBody, CardImg, CardText, CardTitle } from "reactstrap";
-import { formatData } from "../../helpers/helpers";
+import { Card, CardBody, CardImg, CardText } from "reactstrap";
 
 // TODO: use tag on card??
-const EventRow = ({ event }) => {
+const EventRow = ({ group }) => {
   return (
     <Card className="my-2">
-      <Link to={`${event.id}`}>
+      <Link to={`${group.id}`}>
         <CardImg
           alt="Card image cap"
           src="https://picsum.photos/900/180"
@@ -19,17 +18,20 @@ const EventRow = ({ event }) => {
         />
         <CardBody>
           <CardText>
-            <b><medium className="text-muted fs-3">{formatData(event.date)}</medium></b>
+            <b>
+              <medium className="text-muted fs-3">{group.name}</medium>
+            </b>
           </CardText>
-          <CardTitle className="fs-3" tag="h5">{event.title}</CardTitle>
           <hr></hr>
           <CardText>
             <small className="text-muted">
-              Created by: {event.firstName} {event.lastName}
+              Created by: {group.firstName} {group.lastName}
             </small>
           </CardText>
           <CardText>
-            <small className="text-muted">is favorite: {String(event.isFavorite)}</small>
+            <small className="text-muted">
+              is favorite: {String(group.isFavorite)}
+            </small>
           </CardText>
         </CardBody>
       </Link>

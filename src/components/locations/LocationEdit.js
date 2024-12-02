@@ -1,39 +1,33 @@
 import React, { useContext, useEffect, useState } from "react";
-import EventsAPI from "../../api/EventsAPI";
+import LocationsAPI from "../../api/LocationsAPI";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, FormGroup, Label, Input, Button, Col } from "reactstrap";
-import DatePicker from "react-datepicker";
 import Context from "../Context";
-import Loader from "../Loader";
 
-const EventEdit = () => {
+const LocationEdit = () => {
   const { id } = useParams();
   const { currentUser } = useContext(Context);
 
   const [formData, setFormData] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState();
   const navigate = useNavigate();
 
-  // first, find the event data
+  // first, find the location data
   useEffect(() => {
     async function getData() {
       try {
-        const { title, description, date, location, createdBy } =
-          await EventsAPI.get(id);
+        const { name, description, address } = await LocationsAPI.get(id);
 
-        if (currentUser.id !== createdBy) {
+        if (currentUser.isAdmin !== "true") {
           navigate("/");
         }
 
         setFormData({
-          title,
+          name,
           description,
-          date,
-          location,
+          address,
         });
-        setIsLoading(false);
       } catch (error) {
         setError(error);
       }
@@ -52,32 +46,28 @@ const EventEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await EventsAPI.update(id, formData);
-      navigate(`/events/${id}`);
+      await LocationsAPI.update(id, formData);
+      navigate(`/locations/${id}`);
     } catch (error) {
-      setError(error || "Failed to update event");
+      setError(error || "Failed to update location");
       setIsSuccess(false);
     }
   };
 
-  if (!isLoading) {
-    return <Loader />;
-  }
-
   return (
     <Form onSubmit={handleSubmit}>
-      <h3 className="text-center mb-4">Event Update</h3>
+      <h3 className="text-center mb-4">Location Update</h3>
       <FormGroup row>
-        <Label for="exampleTitle" sm={2}>
-          Title
+        <Label for="exampleName" sm={2}>
+          Name
         </Label>
         <Col sm={10}>
           <Input
-            id="exampleTitle"
-            name="title"
-            placeholder="title"
+            id="exampleName"
+            name="name"
+            placeholder="name"
             type="text"
-            value={formData.title}
+            value={formData.name}
             onChange={handleChange}
           />
         </Col>
@@ -98,34 +88,17 @@ const EventEdit = () => {
         </Col>
       </FormGroup>
       <FormGroup row>
-        <Label for="exampleLocation" sm={2}>
-          Location
+        <Label for="exampleAddress" sm={2}>
+          Address
         </Label>
         <Col sm={10}>
           <Input
-            id="exampleLocation"
-            name="location"
-            placeholder="location"
+            id="exampleAddress"
+            name="address"
+            placeholder="address"
             type="text"
-            value={formData.location}
+            value={formData.address}
             onChange={handleChange}
-          />
-        </Col>
-      </FormGroup>
-      <FormGroup row>
-        <Label for="exampleDate" sm={2}>
-          Date
-        </Label>
-        <Col sm={2}>
-          <DatePicker
-            id="datePicker"
-            selected={formData.date ? new Date(formData.date) : null}
-            onChange={(date) =>
-              handleChange({ target: { name: "date", value: date } })
-            }
-            showTimeSelect
-            dateFormat="Pp"
-            className="form-control"
           />
         </Col>
       </FormGroup>
@@ -153,4 +126,4 @@ const EventEdit = () => {
   );
 };
 
-export default EventEdit;
+export default LocationEdit;

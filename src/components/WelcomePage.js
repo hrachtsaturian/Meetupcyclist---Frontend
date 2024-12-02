@@ -3,8 +3,7 @@ import Logo from "../images/logo.png";
 import { Button } from "reactstrap";
 import { Link } from "react-router-dom";
 
-
-const NonLoggedInHomepage = () => {
+const WelcomePage = () => {
   return (
     <div className="nonLoggedInPage">
     <div className="leftSide">
@@ -31,4 +30,4 @@ const NonLoggedInHomepage = () => {
 );
 }
 
-export default NonLoggedInHomepage;
+export default WelcomePage;

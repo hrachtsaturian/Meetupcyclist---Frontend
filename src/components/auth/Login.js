@@ -20,7 +20,7 @@ const Login = ({ login }) => {
     e.preventDefault();
     try {
       const token = await UsersAPI.authenticate(formData);
-      login(token);
+      await login(token);
       navigate("/");
     } catch (error) {
       console.log(error);

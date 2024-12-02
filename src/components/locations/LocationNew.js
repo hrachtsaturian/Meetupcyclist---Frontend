@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import { Form, Button, Col, FormGroup, Input, Label } from "reactstrap";
 import { useNavigate } from "react-router-dom";
-import DatePicker from "react-datepicker";
-import EventsAPI from "../../api/EventsAPI";
+import LocationsAPI from "../../api/LocationsAPI";
 
-const EventNew = () => {
+const LocationNew = () => {
   const [formData, setFormData] = useState({
-    title: "",
+    name: "",
     description: "",
-    date: "",
-    location: "",
+    address: "",
   });
   const [error, setError] = useState();
   const navigate = useNavigate();
@@ -22,28 +20,27 @@ const EventNew = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await EventsAPI.create(formData);
-      navigate("/events");
+      await LocationsAPI.create(formData);
+      navigate("/locations");
     } catch (error) {
       console.log(error);
-      setError(error || "Failed to create event");
+      setError(error || "Failed to create location");
     }
   };
-
   return (
     <Form onSubmit={handleSubmit}>
-      <h3 className="text-center mb-4">New Event</h3>
+      <h3 className="text-center mb-4">New Location</h3>
       <FormGroup row>
-        <Label for="exampleTitle" sm={2}>
-          Title
+        <Label for="exampleName" sm={2}>
+          Name
         </Label>
         <Col sm={10}>
           <Input
-            id="exampleTitle"
-            name="title"
-            placeholder="title"
+            id="exampleName"
+            name="name"
+            placeholder="name"
             type="text"
-            value={formData.title}
+            value={formData.name}
             onChange={handleChange}
           />
         </Col>
@@ -64,34 +61,17 @@ const EventNew = () => {
         </Col>
       </FormGroup>
       <FormGroup row>
-        <Label for="exampleLocation" sm={2}>
-          Location
+        <Label for="exampleAddress" sm={2}>
+          Address
         </Label>
         <Col sm={10}>
           <Input
-            id="exampleLocation"
-            name="location"
-            placeholder="location"
+            id="exampleAddress"
+            name="address"
+            placeholder="address"
             type="text"
-            value={formData.location}
+            value={formData.address}
             onChange={handleChange}
-          />
-        </Col>
-      </FormGroup>
-      <FormGroup row>
-        <Label for="exampleDate" sm={2}>
-          Date
-        </Label>
-        <Col sm={2}>
-          <DatePicker
-            id="datePicker"
-            selected={formData.date}
-            onChange={(date) =>
-              handleChange({ target: { name: "date", value: date } })
-            }
-            showTimeSelect
-            dateFormat="Pp"
-            className="form-control"
           />
         </Col>
       </FormGroup>
@@ -105,4 +85,4 @@ const EventNew = () => {
   );
 };
 
-export default EventNew;
+export default LocationNew;

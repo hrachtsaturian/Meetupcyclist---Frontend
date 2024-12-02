@@ -1,41 +1,40 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import EventsAPI from "../../api/EventsAPI";
+import GroupsAPI from "../../api/GroupsAPI";
 import Loader from "../Loader";
 import Context from "../Context";
 import { Button, Col } from "reactstrap";
-import { formatData } from "../../helpers/helpers";
 
-const Event = () => {
+const Group = () => {
   const { id } = useParams();
 
-  const [event, setEvent] = useState();
+  const [group, setGroup] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
-  const [isAttending, setIsAttending] = useState(false);
+  const [isJoined, setIsJoined] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const navigate = useNavigate();
 
   const { currentUser } = useContext(Context);
 
   // do we need loading state to prevent double click?
-  const toggleAttendance = async () => {
-    if (isAttending) {
-      await EventsAPI.unattend(id); // Unattend the event
-      setIsAttending(false);
+  const toggleMembership = async () => {
+    if (isFavorite) {
+      await GroupsAPI.withdraw(id); // Withdraw from the group
+      setIsFavorite(false);
     } else {
-      await EventsAPI.attend(id); // Attend the event
-      setIsAttending(true);
+      await GroupsAPI.join(id); // Join the group
+      setIsFavorite(true);
     }
   };
 
   // do we need loading state to prevent double click?
   const toggleFavorite = async () => {
     if (isFavorite) {
-      await EventsAPI.removeFav(id); // Unfavorite the event
+      await GroupsAPI.removeFav(id); // Unfavorite the group
       setIsFavorite(false);
     } else {
-      await EventsAPI.makeFav(id); // Favorite the event
+      await GroupsAPI.makeFav(id); // Favorite the group
       setIsFavorite(true);
     }
   };
@@ -43,18 +42,11 @@ const Event = () => {
   useEffect(() => {
     async function getData() {
       try {
-        const {
-          title,
-          description,
-          date,
-          location,
-          createdBy,
-          isFavorite,
-          isAttending,
-        } = await EventsAPI.get(id);
-        setIsAttending(isAttending);
+        const { name, description, createdBy, isFavorite, isJoined } =
+          await GroupsAPI.get(id);
+        setIsJoined(isJoined);
         setIsFavorite(isFavorite);
-        setEvent({ title, description, date, location, createdBy });
+        setGroup({ name, description, createdBy });
         setIsLoading(false);
       } catch (error) {
         setError(error);
@@ -65,17 +57,17 @@ const Event = () => {
 
   const handleDelete = async () => {
     try {
-      await EventsAPI.delete(id);
-      navigate("/events");
+      await GroupsAPI.delete(id);
+      navigate("/groups");
     } catch (error) {
-      setError("Failed to delete the event");
+      setError("Failed to delete the group");
     }
   };
 
   if (error) {
     return (
       <div class="alert alert-danger" role="alert">
-        {error || "Failed to find event info"}
+        {error || "Failed to find group info"}
       </div>
     );
   }
@@ -84,25 +76,23 @@ const Event = () => {
     return <Loader />;
   }
 
-  let sameUser = currentUser.id === event.createdBy;
+  let sameUser = currentUser.id === group.createdBy;
 
   return (
     <>
-      <h3 className="text-center mb-4">Event</h3>
-      <div className="event-header">
-        <h5>{event.title}</h5>
-        <p>{event.description}</p>
-        <b>{formatData(event.date)}</b>
-        <b>{event.location}</b>
+      <h3 className="text-center mb-4">Group</h3>
+      <div className="group-header">
+        <h5>{group.name}</h5>
+        <p>{group.description}</p>
         <Col>
-          <Button onClick={toggleAttendance}>
-            {isAttending ? "Unattend" : "Attend"}
+          <Button onClick={toggleMembership}>
+            {isJoined ? "Withdraw" : "Join"}
           </Button>
         </Col>
         <Col>
           <Button onClick={toggleFavorite}>
             {isFavorite ? "Unfavorite" : "Add to Favorites"}
-          </Button>   
+          </Button>
         </Col>
         {sameUser ? (
           <Col
@@ -111,7 +101,7 @@ const Event = () => {
               size: 10,
             }}
           >
-            <Button tag={Link} to={`/events/${id}/edit`}>
+            <Button tag={Link} to={`/groups/${id}/edit`}>
               Edit
             </Button>
             <Button color="danger" onClick={handleDelete} className="ms-2">
@@ -124,4 +114,4 @@ const Event = () => {
   );
 };
 
-export default Event;
+export default Group;

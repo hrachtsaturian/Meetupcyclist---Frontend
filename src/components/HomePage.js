@@ -1,6 +1,6 @@
 import React from "react";
 
-const LoggedInHomepage = () => {
+const HomePage = () => {
     return (
       <div className="loggedInPage">
         <h1>Meetupcyclist</h1>
@@ -10,4 +10,4 @@ const LoggedInHomepage = () => {
     );
   }
 
-export default LoggedInHomepage;
+export default HomePage;

@@ -1,10 +1,10 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   Navbar,
   NavbarBrand,
   Nav,
   NavItem,
-  UncontrolledDropdown,
+  Dropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
@@ -15,48 +15,65 @@ import Logo from "../images/logo.png";
 
 const NavBar = ({ logout = () => {} }) => {
   const { currentUser } = useContext(Context);
+
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+
+  const toggleProfileDropdown = () => setProfileDropdownOpen((prevState) => !prevState);
+
   return (
     <div>
       <Navbar className="my-0" color="dark" fixed="top" dark>
-        <NavbarBrand href="/">
-          <img alt="logo" src={Logo} style={{ width: "150px" }} />{" "}
+        <NavbarBrand tag={Link} to="/" style={{ minHeight: "105px" }}>
+          <img alt="logo" src={Logo} style={{ width: "150px" }} />
         </NavbarBrand>
-        <NavbarBrand href="/">Meetupcyclist</NavbarBrand>
+        <NavbarBrand tag={Link} to="/">
+          Meetupcyclist
+        </NavbarBrand>
         <Nav className="me-auto" navbar>
           <div className="nav-container">
             {currentUser ? (
               <>
                 <NavItem>
-                  <Link className="nav-link" to="/events/">
+                  <Link className="nav-link" to="/events">
                     Events
                   </Link>
                 </NavItem>
-                <UncontrolledDropdown nav inNavbar>
+                <NavItem>
+                  <Link className="nav-link" to="/groups">
+                    Groups
+                  </Link>
+                </NavItem>
+                <NavItem>
+                  <Link className="nav-link" to="/locations">
+                    Locations
+                  </Link>
+                </NavItem>
+                <Dropdown
+                  isOpen={profileDropdownOpen}
+                  toggle={toggleProfileDropdown}
+                  onMouseEnter={toggleProfileDropdown}
+                  onMouseLeave={toggleProfileDropdown}
+                >
                   <DropdownToggle className="profile-tag" nav caret>
                     Profile
                   </DropdownToggle>
-                  <DropdownMenu right>
-                    <DropdownItem>My events</DropdownItem>
-                    <DropdownItem>My groups</DropdownItem>
-                    <DropdownItem>
-                      {" "}
-                      <Link to={`/favorites`}>My favorites</Link>
+                  <DropdownMenu>
+                    <DropdownItem tag={Link} to={"/myevents"}>
+                      My events
+                    </DropdownItem>
+                    <DropdownItem tag={Link} to={"/mygroups"}>
+                      My groups
+                    </DropdownItem>
+                    <DropdownItem tag={Link} to={"/myfavorites"}>
+                      My favorites
                     </DropdownItem>
                     <DropdownItem divider />
-                    <DropdownItem>
-                      <DropdownItem>
-                        <Link to={`/users/${currentUser.id}`}>
-                          View profile
-                        </Link>
-                      </DropdownItem>
+                    <DropdownItem tag={Link} to={`/users/${currentUser.id}`}>
+                      View profile
                     </DropdownItem>
-                    <DropdownItem>
-                      <Link to="/" onClick={() => logout()}>
-                        Logout
-                      </Link>
-                    </DropdownItem>
+                    <DropdownItem onClick={() => logout()}>Logout</DropdownItem>
                   </DropdownMenu>
-                </UncontrolledDropdown>
+                </Dropdown>
               </>
             ) : (
               <>

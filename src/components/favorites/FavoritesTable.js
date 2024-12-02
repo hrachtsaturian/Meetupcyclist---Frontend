@@ -1,29 +1,22 @@
 import React from "react";
-import FavoriteRow from "./FavoriteRow";
+import FavoriteEventCard from "./FavoriteEventCard";
 
-const FavoritesTable = ({ favorites }) => {
+const FavoritesTable = ({ favorites, selectedFilter }) => {
   return (
-    // the idea is have sectors on the page like :
-    // My Favorites
-
-    // EVENTS
-    // [ ... ]
-
-    // GROUPS
-    // [ ... ]
-
-    // LOCATIONS
-    // [ ... ]
-
     <div className="favorites-table">
-      <h5>Events</h5>
       {favorites.length === 0 ? (
-        <p>You have no favorite events yet.</p>
+        <p>You have no favorites yet.</p>
       ) : (
         <>
-          {favorites.map((favorite) => (
-            <FavoriteRow favorite={favorite} />
-          ))}
+          {favorites.map((favorite) => {
+            if (selectedFilter === "events") {
+              return <FavoriteEventCard event={favorite} />;
+            }
+            // if (selectedFilter === "groups") {
+            //   return <FavoriteGroupCard event={favorite} />;
+            // }
+            return null;
+          })}
         </>
       )}
     </div>

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import NavBar from "./components/NavBar";
-import Home from "./components/Home";
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
 import Profile from "./components/users/Profile";
@@ -11,6 +10,16 @@ import Event from "./components/events/Event";
 import Events from "./components/events/Events";
 import EventNew from "./components/events/EventNew";
 import EventEdit from "./components/events/EventEdit";
+import AttendingEvents from "./components/attendingEvents/AttendingEvents";
+import Group from "./components/groups/Group";
+import Groups from "./components/groups/Groups";
+import GroupNew from "./components/groups/GroupNew";
+import GroupEdit from "./components/groups/GroupEdit";
+import JoinedGroups from "./components/joinedGroups/JoinedGroups";
+import Location from "./components/locations/Location";
+import Locations from "./components/locations/Locations";
+import LocationNew from "./components/locations/LocationNew";
+import LocationEdit from "./components/locations/LocationEdit";
 import Favorites from "./components/favorites/Favorites";
 import Context from "./components/Context";
 import Loader from "./components/Loader";
@@ -21,6 +30,8 @@ import UsersAPI from "./api/UsersAPI";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "./styles/App.css";
+import HomePage from "./components/HomePage";
+import WelcomePage from "./components/WelcomePage";
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState();
@@ -45,14 +56,14 @@ const App = () => {
     setIsInitializing(false);
   };
 
-  const login = (userToken) => {
-    checkUserLoggedIn(userToken);
+  const login = async (userToken) => {
+    await checkUserLoggedIn(userToken);
     window.localStorage.setItem("token", userToken);
   };
 
   const logout = () => {
-    setCurrentUser();
     window.localStorage.removeItem("token");
+    setCurrentUser();
   };
 
   // when on the website, check if user is already logged in
@@ -63,14 +74,23 @@ const App = () => {
 
   return (
     <div className="App">
-      {isInitializing && <Loader />}
-      {!isInitializing && (
-        <BrowserRouter>
-          <Context.Provider value={{ currentUser, setCurrentUser }}>
-            <NavBar logout={logout} />
+      <BrowserRouter>
+        <Context.Provider value={{ currentUser, setCurrentUser }}>
+          <NavBar logout={logout} />
+          {isInitializing && <Loader />}
+          {!isInitializing && (
             <div className="container">
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route
+                  path="/"
+                  element={
+                    currentUser ? (
+                      <ProtectedRoute element={<HomePage />} />
+                    ) : (
+                      <WelcomePage />
+                    )
+                  }
+                />
                 <Route
                   path="/users/:id"
                   element={<ProtectedRoute element={<Profile />} />}
@@ -81,11 +101,7 @@ const App = () => {
                 />
                 <Route
                   path="/events"
-                  element={
-                    <ProtectedRoute
-                      element={<Events />}
-                    />
-                  }
+                  element={<ProtectedRoute element={<Events />} />}
                 />
                 <Route
                   path="/events/new"
@@ -100,21 +116,57 @@ const App = () => {
                   element={<ProtectedRoute element={<EventEdit />} />}
                 />
                 <Route
-                  path="/favorites"
-                  element={
-                    <ProtectedRoute
-                      element={<Favorites />}
-                    />
-                  }
+                  path="/groups"
+                  element={<ProtectedRoute element={<Groups />} />}
+                />
+                <Route
+                  path="/groups/new"
+                  element={<ProtectedRoute element={<GroupNew />} />}
+                />
+                <Route
+                  path="/groups/:id"
+                  element={<ProtectedRoute element={<Group />} />}
+                />
+                <Route
+                  path="/groups/:id/edit"
+                  element={<ProtectedRoute element={<GroupEdit />} />}
+                />
+                <Route
+                  path="/locations"
+                  element={<ProtectedRoute element={<Locations />} />}
+                />
+                <Route
+                  path="/locations/new"
+                  element={<ProtectedRoute element={<LocationNew />} />}
+                />
+                <Route
+                  path="/locations/:id"
+                  element={<ProtectedRoute element={<Location />} />}
+                />
+                <Route
+                  path="/locations/:id/edit"
+                  element={<ProtectedRoute element={<LocationEdit />} />}
+                />
+                <Route
+                  path="/myevents"
+                  element={<ProtectedRoute element={<AttendingEvents />} />}
+                />
+                <Route
+                  path="/mygroups"
+                  element={<ProtectedRoute element={<JoinedGroups />} />}
+                />
+                <Route
+                  path="/myfavorites"
+                  element={<ProtectedRoute element={<Favorites />} />}
                 />
                 <Route path="/login" element={<Login login={login} />} />
                 <Route path="/signup" element={<Signup login={login} />} />
                 <Route path="*" element={<div>404: Page Not Found</div>} />
               </Routes>
             </div>
-          </Context.Provider>
-        </BrowserRouter>
-      )}
+          )}
+        </Context.Provider>
+      </BrowserRouter>
     </div>
   );
 };
