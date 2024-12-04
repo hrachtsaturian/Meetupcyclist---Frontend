@@ -22,8 +22,8 @@ const EventNew = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await EventsAPI.create(formData);
-      navigate("/events");
+      const newEvent = await EventsAPI.create(formData);
+      navigate(`/events/${newEvent.id}`);
     } catch (error) {
       console.log(error);
       setError(error || "Failed to create event");
@@ -89,9 +89,11 @@ const EventNew = () => {
             onChange={(date) =>
               handleChange({ target: { name: "date", value: date } })
             }
+            minDate={new Date()}
             showTimeSelect
             dateFormat="Pp"
             className="form-control"
+            autoComplete="off"
           />
         </Col>
       </FormGroup>

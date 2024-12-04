@@ -64,8 +64,8 @@ const NavBar = ({ logout = () => {} }) => {
                     <DropdownItem tag={Link} to={"/mygroups"}>
                       My groups
                     </DropdownItem>
-                    <DropdownItem tag={Link} to={"/myfavorites"}>
-                      My favorites
+                    <DropdownItem tag={Link} to={"/saved"}>
+                      Saved
                     </DropdownItem>
                     <DropdownItem divider />
                     <DropdownItem tag={Link} to={`/users/${currentUser.id}`}>

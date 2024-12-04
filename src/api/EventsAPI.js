@@ -6,11 +6,12 @@ import BaseAPI from "./BaseAPI";
  */
 class EventsAPI extends BaseAPI {
   static async create(data) {
-    await this.request({
+    const res = await this.request({
       path: `events`,
       data,
       method: "post",
     });
+    return res.data;
   }
 
   static async get(id) {
@@ -18,8 +19,12 @@ class EventsAPI extends BaseAPI {
     return res.data;
   }
 
-  static async getAll({ showAttendingEvents = false, showFavorites = false } = {}) {
-    const query = new URLSearchParams({ showAttendingEvents, showFavorites });
+  static async getAll({
+    showAttendingEvents = false,
+    showSaves = false,
+    showPastEvents = false,
+  } = {}) {
+    const query = new URLSearchParams({ showAttendingEvents, showSaves, showPastEvents });
     const res = await this.request({ path: `events?${query.toString()}` });
     return res.data;
   }
@@ -56,18 +61,18 @@ class EventsAPI extends BaseAPI {
     });
   }
 
-  // addFavorite // POST events/:id/favorite
-  static async makeFav(eventId) {
+  // addSave // POST events/:id/saved
+  static async makeSave(eventId) {
     await this.request({
-      path: `events/${eventId}/favorite`,
+      path: `events/${eventId}/saved`,
       method: "post",
     });
   }
 
-  // removeFavorite // DELETE events/:id/favorite
-  static async removeFav(eventId) {
+  // removeSave // DELETE events/:id/saved
+  static async removeSave(eventId) {
     await this.request({
-      path: `events/${eventId}/favorite`,
+      path: `events/${eventId}/saved`,
       method: "delete",
     });
   }

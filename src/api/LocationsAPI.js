@@ -18,8 +18,9 @@ class LocationsAPI extends BaseAPI {
     return res.data;
   }
 
-  static async getAll() {
-    const res = await this.request({ path: `locations` });
+  static async getAll({ showSaves = false } = {}) {
+    const query = new URLSearchParams({ showSaves });
+    const res = await this.request({ path: `locations?${query.toString()}` });
     return res.data;
   }
 
@@ -39,19 +40,19 @@ class LocationsAPI extends BaseAPI {
     });
   }
 
-  // addFavorite // POST locations/:id/favorite
-  static async makeFav(locationId) {
+  // addSave // POST locations/:id/saved
+  static async makeSave(locationId) {
     const res = await this.request({
-      path: `locations/${locationId}/favorite`,
+      path: `locations/${locationId}/saved`,
       method: "post",
     });
     return res.data;
   }
 
-  // removeFavorite // DELETE locations/:id/favorite
-  static async removeFav(locationId) {
+  // removeSave // DELETE locations/:id/saved
+  static async removeSave(locationId) {
     await this.request({
-      path: `locations/${locationId}/favorite`,
+      path: `locations/${locationId}/saved`,
       method: "delete",
     });
   }

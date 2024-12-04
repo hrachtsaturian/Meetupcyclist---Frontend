@@ -52,7 +52,7 @@ const EventEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await EventsAPI.update(id, formData);
+      await EventsAPI.update(id, { ...formData });
       navigate(`/events/${id}`);
     } catch (error) {
       setError(error || "Failed to update event");
@@ -60,9 +60,14 @@ const EventEdit = () => {
     }
   };
 
-  if (!isLoading) {
+  if (isLoading) {
     return <Loader />;
   }
+
+  const maxTime = new Date();
+  maxTime.setHours(23);
+  maxTime.setMinutes(59);
+  maxTime.setSeconds(59);
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -123,9 +128,12 @@ const EventEdit = () => {
             onChange={(date) =>
               handleChange({ target: { name: "date", value: date } })
             }
+            minDate={new Date()}
             showTimeSelect
             dateFormat="Pp"
             className="form-control"
+            autoComplete="off"
+            timeIntervals={15}
           />
         </Col>
       </FormGroup>

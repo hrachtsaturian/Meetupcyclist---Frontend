@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import WelcomePage from "./components/WelcomePage";
+import HomePage from "./components/HomePage";
 import NavBar from "./components/NavBar";
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
@@ -20,7 +22,7 @@ import Location from "./components/locations/Location";
 import Locations from "./components/locations/Locations";
 import LocationNew from "./components/locations/LocationNew";
 import LocationEdit from "./components/locations/LocationEdit";
-import Favorites from "./components/favorites/Favorites";
+import Saves from "./components/saves/Saves";
 import Context from "./components/Context";
 import Loader from "./components/Loader";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -30,8 +32,6 @@ import UsersAPI from "./api/UsersAPI";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "./styles/App.css";
-import HomePage from "./components/HomePage";
-import WelcomePage from "./components/WelcomePage";
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState();
@@ -156,8 +156,8 @@ const App = () => {
                   element={<ProtectedRoute element={<JoinedGroups />} />}
                 />
                 <Route
-                  path="/myfavorites"
-                  element={<ProtectedRoute element={<Favorites />} />}
+                  path="/saved"
+                  element={<ProtectedRoute element={<Saves />} />}
                 />
                 <Route path="/login" element={<Login login={login} />} />
                 <Route path="/signup" element={<Signup login={login} />} />

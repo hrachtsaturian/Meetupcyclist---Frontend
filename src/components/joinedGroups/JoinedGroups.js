@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import JoinedGroupsTable from "./JoinedGroupsTable";
-import axios from "axios";
+import GroupsAPI from "../../api/GroupsAPI";
 import Loader from "../Loader";
 
 const JoinedGroups = () => {
@@ -10,9 +10,8 @@ const JoinedGroups = () => {
   useEffect(() => {
     async function getJoinedGroups() {
       try {
-        const res = await axios.get("/groups?showJoinedGroups=true");
-        setJoinedGroups(res.data.data);
-        console.log(joinedGroups);
+        const groups = await GroupsAPI.getAll({ showJoinedGroups: true });
+        setJoinedGroups(groups);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching joined groups:", err);

@@ -10,7 +10,7 @@ import {
 } from "reactstrap";
 import { formatData } from "../../helpers/helpers";
 
-const FavoriteEventCard = ({ event }) => {
+const SaveEventCard = ({ event }) => {
   return (
     <Card
       style={{
@@ -32,4 +32,4 @@ const FavoriteEventCard = ({ event }) => {
   );
 };
 
-export default FavoriteEventCard;
+export default SaveEventCard;

@@ -11,28 +11,28 @@ const Location = () => {
   const [location, setLocation] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const navigate = useNavigate();
 
   const { currentUser } = useContext(Context);
 
   // do we need loading state to prevent double click?
-  const toggleFavorite = async () => {
-    if (isFavorite) {
-      await LocationsAPI.removeFav(id); // Unfavorite the location
-      setIsFavorite(false);
+  const toggleSave = async () => {
+    if (isSaved) {
+      await LocationsAPI.removeSave(id); // Unsave the location
+      setIsSaved(false);
     } else {
-      await LocationsAPI.makeFav(id); // Favorite the location
-      setIsFavorite(true);
+      await LocationsAPI.makeSave(id); // Save the location
+      setIsSaved(true);
     }
   };
 
   useEffect(() => {
     async function getData() {
       try {
-        const { name, description, address, createdBy, isFavorite } =
+        const { name, description, address, createdBy, isSaved } =
           await LocationsAPI.get(id);
-        setIsFavorite(isFavorite);
+        setIsSaved(isSaved);
         setLocation({ name, description, address, createdBy });
         setIsLoading(false);
       } catch (error) {
@@ -63,7 +63,8 @@ const Location = () => {
     return <Loader />;
   }
 
-  let isAdmin = currentUser.isAdmin === "true";
+  let isAdmin = currentUser.isAdmin;
+  let sameUser = currentUser.id === location.createdBy;
 
   return (
     <>
@@ -71,12 +72,13 @@ const Location = () => {
       <div className="location-header">
         <h5>{location.name}</h5>
         <p>{location.description}</p>
+        <p>{location.address}</p>
         <Col>
-          <Button onClick={toggleFavorite}>
-            {isFavorite ? "Unfavorite" : "Add to Favorites"}
+          <Button onClick={toggleSave}>
+            {isSaved ? "Unsave" : "Save"}
           </Button>
         </Col>
-        {isAdmin ? (
+        {isAdmin || sameUser ? (
           <Col
             sm={{
               offset: 2,

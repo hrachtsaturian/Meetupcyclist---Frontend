@@ -44,7 +44,7 @@ const Locations = () => {
         <LocationsTable locations={locations} />
       </div>
       <div className="create-location-container">
-        <Link to="/groups/new">
+        <Link to="/locations/new">
           <Col>
             <Button>Create a new location</Button>
           </Col>

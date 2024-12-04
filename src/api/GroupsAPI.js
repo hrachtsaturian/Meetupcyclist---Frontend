@@ -18,8 +18,9 @@ class GroupsAPI extends BaseAPI {
     return res.data;
   }
 
-  static async getAll() {
-    const res = await this.request({ path: `groups` });
+  static async getAll({ showJoinedGroups = false, showSaves = false } = {}) {
+    const query = new URLSearchParams({ showJoinedGroups, showSaves });
+    const res = await this.request({ path: `groups?${query.toString()}` });
     return res.data;
   }
 
@@ -48,27 +49,27 @@ class GroupsAPI extends BaseAPI {
     return res.data;
   }
 
-  // withdraw // DELETE groups/:id/membership
-  static async withdraw(groupId) {
+  // leave // DELETE groups/:id/membership
+  static async leave(groupId) {
     await this.request({
       path: `groups/${groupId}/membership`,
       method: "delete",
     });
   }
 
-  // addFavorite // POST groups/:id/favorite
-  static async makeFav(groupId) {
+  // addSave // POST groups/:id/saved
+  static async makeSave(groupId) {
     const res = await this.request({
-      path: `groups/${groupId}/favorite`,
+      path: `groups/${groupId}/saved`,
       method: "post",
     });
     return res.data;
   }
 
-  // removeFavorite // DELETE groups/:id/favorite
-  static async removeFav(groupId) {
+  // removeSave // DELETE groups/:id/saved
+  static async removeSave(groupId) {
     await this.request({
-      path: `groups/${groupId}/favorite`,
+      path: `groups/${groupId}/saved`,
       method: "delete",
     });
   }

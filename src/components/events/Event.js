@@ -13,7 +13,7 @@ const Event = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
   const [isAttending, setIsAttending] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const navigate = useNavigate();
 
   const { currentUser } = useContext(Context);
@@ -30,13 +30,13 @@ const Event = () => {
   };
 
   // do we need loading state to prevent double click?
-  const toggleFavorite = async () => {
-    if (isFavorite) {
-      await EventsAPI.removeFav(id); // Unfavorite the event
-      setIsFavorite(false);
+  const toggleSave = async () => {
+    if (isSaved) {
+      await EventsAPI.removeSave(id); // Unsave the event
+      setIsSaved(false);
     } else {
-      await EventsAPI.makeFav(id); // Favorite the event
-      setIsFavorite(true);
+      await EventsAPI.makeSave(id); // Save the event
+      setIsSaved(true);
     }
   };
 
@@ -49,11 +49,11 @@ const Event = () => {
           date,
           location,
           createdBy,
-          isFavorite,
+          isSaved,
           isAttending,
         } = await EventsAPI.get(id);
         setIsAttending(isAttending);
-        setIsFavorite(isFavorite);
+        setIsSaved(isSaved);
         setEvent({ title, description, date, location, createdBy });
         setIsLoading(false);
       } catch (error) {
@@ -100,9 +100,7 @@ const Event = () => {
           </Button>
         </Col>
         <Col>
-          <Button onClick={toggleFavorite}>
-            {isFavorite ? "Unfavorite" : "Add to Favorites"}
-          </Button>   
+          <Button onClick={toggleSave}>{isSaved ? "Unsave" : "Save"}</Button>
         </Col>
         {sameUser ? (
           <Col

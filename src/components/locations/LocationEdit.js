@@ -3,12 +3,14 @@ import LocationsAPI from "../../api/LocationsAPI";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, FormGroup, Label, Input, Button, Col } from "reactstrap";
 import Context from "../Context";
+import Loader from "../Loader";
 
 const LocationEdit = () => {
   const { id } = useParams();
   const { currentUser } = useContext(Context);
 
   const [formData, setFormData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState();
   const navigate = useNavigate();
@@ -19,19 +21,21 @@ const LocationEdit = () => {
       try {
         const { name, description, address } = await LocationsAPI.get(id);
 
-        if (currentUser.isAdmin !== "true") {
-          navigate("/");
-        }
-
         setFormData({
           name,
           description,
           address,
         });
+        setIsLoading(false);
       } catch (error) {
         setError(error);
       }
     }
+
+    if (!currentUser.isAdmin) {
+      return navigate("/");
+    }
+
     if (id) {
       getData();
     }
@@ -53,6 +57,10 @@ const LocationEdit = () => {
       setIsSuccess(false);
     }
   };
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <Form onSubmit={handleSubmit}>
