@@ -12,40 +12,40 @@ const Group = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
   const [isJoined, setIsJoined] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const navigate = useNavigate();
 
   const { currentUser } = useContext(Context);
 
   // do we need loading state to prevent double click?
   const toggleMembership = async () => {
-    if (isFavorite) {
-      await GroupsAPI.withdraw(id); // Withdraw from the group
-      setIsFavorite(false);
+    if (isJoined) {
+      await GroupsAPI.leave(id); // Leave the group
+      setIsJoined(false);
     } else {
       await GroupsAPI.join(id); // Join the group
-      setIsFavorite(true);
+      setIsJoined(true);
     }
   };
 
   // do we need loading state to prevent double click?
-  const toggleFavorite = async () => {
-    if (isFavorite) {
-      await GroupsAPI.removeFav(id); // Unfavorite the group
-      setIsFavorite(false);
+  const toggleSave = async () => {
+    if (isSaved) {
+      await GroupsAPI.removeSave(id); // Unsave the group
+      setIsSaved(false);
     } else {
-      await GroupsAPI.makeFav(id); // Favorite the group
-      setIsFavorite(true);
+      await GroupsAPI.makeSave(id); // Save the group
+      setIsSaved(true);
     }
   };
 
   useEffect(() => {
     async function getData() {
       try {
-        const { name, description, createdBy, isFavorite, isJoined } =
+        const { name, description, createdBy, isSaved, isJoined } =
           await GroupsAPI.get(id);
         setIsJoined(isJoined);
-        setIsFavorite(isFavorite);
+        setIsSaved(isSaved);
         setGroup({ name, description, createdBy });
         setIsLoading(false);
       } catch (error) {
@@ -86,13 +86,11 @@ const Group = () => {
         <p>{group.description}</p>
         <Col>
           <Button onClick={toggleMembership}>
-            {isJoined ? "Withdraw" : "Join"}
+            {isJoined ? "Leave" : "Join"}
           </Button>
         </Col>
         <Col>
-          <Button onClick={toggleFavorite}>
-            {isFavorite ? "Unfavorite" : "Add to Favorites"}
-          </Button>
+          <Button onClick={toggleSave}>{isSaved ? "Unsave" : "Save"}</Button>
         </Col>
         {sameUser ? (
           <Col

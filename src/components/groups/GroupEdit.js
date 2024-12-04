@@ -3,12 +3,14 @@ import GroupsAPI from "../../api/GroupsAPI";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, FormGroup, Label, Input, Button, Col } from "reactstrap";
 import Context from "../Context";
+import Loader from "../Loader";
 
 const GroupEdit = () => {
   const { id } = useParams();
   const { currentUser } = useContext(Context);
 
   const [formData, setFormData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState();
   const navigate = useNavigate();
@@ -27,6 +29,7 @@ const GroupEdit = () => {
           name,
           description
         });
+        setIsLoading(false);
       } catch (error) {
         setError(error);
       }
@@ -52,6 +55,10 @@ const GroupEdit = () => {
       setIsSuccess(false);
     }
   };
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <Form onSubmit={handleSubmit}>

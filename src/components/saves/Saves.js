@@ -1,45 +1,51 @@
 import React, { useEffect, useState } from "react";
-import FavoritesTable from "./FavoritesTable";
-import Loader from "../Loader";
+import SavesTable from "./SavesTable";
 import EventsAPI from "../../api/EventsAPI";
+import GroupsAPI from "../../api/GroupsAPI";
+import LocationsAPI from "../../api/LocationsAPI";
 import { ButtonGroup, Button } from "reactstrap";
+import Loader from "../Loader";
 
-const Favorites = () => {
-  const [favorites, setFavorites] = useState([]);
+const Saves = () => {
+  const [saves, setSaves] = useState([]);
   // selector by default - events
   const [selectedFilter, setSelectedFilter] = useState("events");
   const [isLoading, setIsLoading] = useState(true);
 
-  const getFavoritesApiRequest = async (selectedFilter) => {
+  // do we need await in front of .getAll() methods for fetching data?
+  const getSavesApiRequest = async (selectedFilter) => {
     if (selectedFilter === "events") {
-      return EventsAPI.getAll({ showFavorites: true });
+      return EventsAPI.getAll({ showSaves: true, showPastEvents: true });
     }
-    // if (selectedFilter === "groups") {
-    //   return GroupsAPI.getAll({ showFavorites: true });
-    // }
+    if (selectedFilter === "groups") {
+      return GroupsAPI.getAll({ showSaves: true });
+    }
+    if (selectedFilter === "locations") {
+      return LocationsAPI.getAll({ showSaves: true });
+    }
     return [];
   };
 
-  const getFavorites = async (selectedFilter) => {
+  const getSaves = async (selectedFilter) => {
     try {
       setIsLoading(true);
-      const favorites = await getFavoritesApiRequest(selectedFilter);
-      setFavorites(favorites);
+      const saves = await getSavesApiRequest(selectedFilter);
+      setSaves(saves);
       setIsLoading(false);
     } catch (err) {
-      console.error("Error fetching favorite data:", err);
+      console.error("Error fetching saved data:", err);
       setIsLoading(false);
     }
   }
 
   useEffect(() => {
-    getFavorites(selectedFilter);
+    getSaves(selectedFilter);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFilter]);
 
   return (
     <>
-      <h3 className="text-center mb-4">My Favorites</h3>
+      <h3 className="text-center mb-4">Saved</h3>
       <div style={{ marginBottom: '12px' }}>
         <ButtonGroup>
           <Button
@@ -65,9 +71,9 @@ const Favorites = () => {
           </Button>
         </ButtonGroup>
       </div>
-      {isLoading ? <Loader /> : <FavoritesTable favorites={favorites} selectedFilter={selectedFilter}/>}
+      {isLoading ? <Loader /> : <SavesTable saves={saves} selectedFilter={selectedFilter}/>}
     </>
   );
 };
 
-export default Favorites;
+export default Saves;
