@@ -6,7 +6,7 @@ const GroupsTable = ({ groups }) => {
     <div className="groups-table">
       {groups?.length > 0
         ? groups.map((group) => <GroupRow key={group.id} group={group} />)
-        : "No results"}
+        : "No groups yet"}
     </div>
   );
 };

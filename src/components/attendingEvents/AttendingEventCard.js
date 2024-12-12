@@ -8,11 +8,16 @@ import {
   CardSubtitle,
   CardText,
   CardTitle,
+  Col,
 } from "reactstrap";
-import { formatData } from "../../helpers/helpers";
+import { formatData, isPastEvent } from "../../helpers/helpers";
+import EventIcon from "../../images/event_icon_default.png";
 
-const AttendingEventCard = ({ attendingEvent, getAttendingEvents, setLoading }) => {
-  // do we need to do something with backend ?
+const AttendingEventCard = ({
+  attendingEvent,
+  getAttendingEvents,
+  setLoading,
+}) => {
   const handleUnattend = async (e) => {
     e.preventDefault(); // Prevent navigation due to card link
     setLoading(true);
@@ -32,14 +37,34 @@ const AttendingEventCard = ({ attendingEvent, getAttendingEvents, setLoading }) 
       tag={Link}
       to={`/events/${attendingEvent.id}`}
     >
-      <img alt="Sample" src="https://picsum.photos/300/200" />
+      <img
+        alt="event-main-photo"
+        src={attendingEvent.pfpUrl || EventIcon
+        }
+      />
       <CardBody>
-        <CardTitle tag="h5">{attendingEvent.title}</CardTitle>
-        <CardSubtitle className="mb-2 text-muted" tag="h6">
-          {formatData(attendingEvent.date)}
+        <CardText>
+          <b>
+            <medium className="text-muted">
+              {formatData(attendingEvent.date)}
+            </medium>
+          </b>
+        </CardText>
+        <CardTitle className="fs-4">{attendingEvent.title}</CardTitle>
+        <CardSubtitle>
+          Organizer: {attendingEvent.firstName} {attendingEvent.lastName}
         </CardSubtitle>
-        <CardText>{attendingEvent.description}</CardText>
-        <Button onClick={handleUnattend}>Unattend</Button>
+        <Col style={{ paddingTop: "10px" }}>
+          {!isPastEvent(attendingEvent) && (
+            <Button
+              color="warning"
+              className="yellow-button"
+              onClick={handleUnattend}
+            >
+              Unattend
+            </Button>
+          )}
+        </Col>
       </CardBody>
     </Card>
   );

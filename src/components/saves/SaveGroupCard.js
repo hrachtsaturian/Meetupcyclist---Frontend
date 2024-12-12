@@ -1,14 +1,30 @@
-import React from "react";
+import React  from "react";
+import GroupsAPI from "../../api/GroupsAPI";
 import { Link } from "react-router-dom";
 import {
-  Button,
   Card,
   CardBody,
-  CardText,
+  CardSubtitle,
   CardTitle,
+  Col,
+  UncontrolledTooltip,
 } from "reactstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBookmark } from "@fortawesome/free-solid-svg-icons";
+import GroupIcon from "../../images/group_icon_default.png";
 
-const SaveGroupCard = ({ group }) => {
+const SaveGroupCard = ({ group, getSaves, setLoading }) => {
+  const handleUnsave = async (e) => {
+    e.preventDefault(); // Prevent navigation due to card link
+    setLoading(true);
+    try {
+      await GroupsAPI.removeSave(group.id);
+      await getSaves();
+    } catch (error) {
+      console.error("Error unsaving the group:", error);
+    }
+  };
+
   return (
     <Card
       style={{
@@ -17,11 +33,33 @@ const SaveGroupCard = ({ group }) => {
       tag={Link}
       to={`/groups/${group.id}`}
     >
-      <img alt="Sample" src="https://picsum.photos/300/200" />
+      <img
+        src={group.pfpUrl || GroupIcon}
+        alt="group-main-photo"
+      />
       <CardBody>
-        <CardTitle tag="h5">{group.name}</CardTitle>
-        <CardText>{group.description}</CardText>
-        <Button>Button</Button>
+        <CardTitle className="fs-4">{group.name}</CardTitle>
+        <CardSubtitle>
+          Founder: {group.firstName} {group.lastName}
+        </CardSubtitle>
+        <Col style={{ paddingTop: "10px" }}>
+          <div
+            id={`unsaveIcon-${group.id}`}
+            style={{
+              cursor: "pointer",
+              display: "inline-block",
+            }}
+            onClick={handleUnsave}
+          >
+            <FontAwesomeIcon icon={faBookmark} className="fa-xl" />
+            <UncontrolledTooltip
+              placement="top"
+              target={`unsaveIcon-${group.id}`}
+            >
+              Unsave
+            </UncontrolledTooltip>
+          </div>
+        </Col>
       </CardBody>
     </Card>
   );

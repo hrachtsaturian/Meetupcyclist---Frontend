@@ -8,7 +8,7 @@ const EventsTable = ({ events }) => {
         ? events.map((event) => (
             <EventRow key={event.id} event={event} />
           ))
-        : "No results"}
+        : "No events yet"}
     </div>
   );
 }

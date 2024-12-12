@@ -1,36 +1,51 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Form, Button, Col, FormGroup, Input, Label } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import LocationsAPI from "../../api/LocationsAPI";
+import Context from "../Context";
+import { uploadImage } from "../../helpers/helpers";
 
 const LocationNew = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     address: "",
+    pfpUrl: ""
   });
+  const { currentUser } = useContext(Context);
   const [error, setError] = useState();
   const navigate = useNavigate();
 
+  if (!currentUser.isAdmin) {
+    return navigate("/");
+  }
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await LocationsAPI.create(formData);
-      navigate("/locations");
+      // issue with creating location - name and description are missing
+      const newLocation = await LocationsAPI.create(formData);
+      navigate(`/locations/${newLocation.id}`);
     } catch (error) {
       console.log(error);
-      setError(error || "Failed to create location");
+      setError(error?.message || "Failed to create location");
     }
   };
+
+  const handleUploadImage = async (e) => {
+    await uploadImage(e, setFormData, setError);
+  };
+  
   return (
     <Form onSubmit={handleSubmit}>
-      <h3 className="text-center mb-4">New Location</h3>
-      <FormGroup row>
+      <h3 style={{fontSize: "40px" }} className="text-center mb-2 meetupcyclist">New Location</h3>
+      <hr></hr>
+      <FormGroup row style={{paddingTop:"40px"}}>
         <Label for="exampleName" sm={2}>
           Name
         </Label>
@@ -61,6 +76,19 @@ const LocationNew = () => {
         </Col>
       </FormGroup>
       <FormGroup row>
+          <Label for="examplePfpUrl" sm={2}>
+            Location Main Photo
+          </Label>
+          <Col sm={10}>
+          <Input
+            id="imageFile"
+            name="imageFile"
+            type="file"
+            onChange={handleUploadImage}
+          />
+        </Col>
+        </FormGroup>
+      <FormGroup row>
         <Label for="exampleAddress" sm={2}>
           Address
         </Label>
@@ -74,8 +102,14 @@ const LocationNew = () => {
             onChange={handleChange}
           />
         </Col>
+        <div style={{paddingTop:"20px"}}>
+        <Col>
+        <Button color="warning" className="yellow-button">
+            Submit
+          </Button>
+        </Col>
+        </div>
       </FormGroup>
-      <Button>Submit</Button>
       {error && (
         <div class="alert alert-danger" role="alert">
           {error}

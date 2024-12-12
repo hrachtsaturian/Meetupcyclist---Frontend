@@ -1,16 +1,18 @@
 import React, { useContext, useEffect, useState } from "react";
-import EventsAPI from "../../api/EventsAPI";
 import { useNavigate, useParams } from "react-router-dom";
-import { Form, FormGroup, Label, Input, Button, Col } from "reactstrap";
+import EventsAPI from "../../api/EventsAPI";
 import DatePicker from "react-datepicker";
 import Context from "../Context";
 import Loader from "../Loader";
+import { Form, FormGroup, Label, Input, Col, Button } from "reactstrap";
+import { uploadImage } from "../../helpers/helpers";
 
 const EventEdit = () => {
   const { id } = useParams();
   const { currentUser } = useContext(Context);
 
   const [formData, setFormData] = useState({});
+  const [isImageRemoved, setIsImageRemoved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState();
@@ -20,10 +22,10 @@ const EventEdit = () => {
   useEffect(() => {
     async function getData() {
       try {
-        const { title, description, date, location, createdBy } =
+        const { title, description, date, location, pfpUrl, createdBy } =
           await EventsAPI.get(id);
 
-        if (currentUser.id !== createdBy) {
+        if (currentUser.id !== createdBy && !currentUser.isAdmin) {
           navigate("/");
         }
 
@@ -32,10 +34,11 @@ const EventEdit = () => {
           description,
           date,
           location,
+          pfpUrl
         });
         setIsLoading(false);
       } catch (error) {
-        setError(error);
+        setError(error?.message);
       }
     }
     if (id) {
@@ -52,12 +55,16 @@ const EventEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await EventsAPI.update(id, { ...formData });
+      await EventsAPI.update(id, { ...formData, pfpUrl: isImageRemoved ? '' : formData.pfpUrl });
       navigate(`/events/${id}`);
     } catch (error) {
-      setError(error || "Failed to update event");
+      setError(error?.message || "Failed to update event");
       setIsSuccess(false);
     }
+  };
+
+  const handleUploadImage = async (e) => {
+    await uploadImage(e, setFormData, setError);
   };
 
   if (isLoading) {
@@ -71,8 +78,9 @@ const EventEdit = () => {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <h3 className="text-center mb-4">Event Update</h3>
-      <FormGroup row>
+      <h3 style={{ fontSize: "40px" }} className="text-center mb-2 meetupcyclist">Event Update</h3>
+      <hr></hr>
+      <FormGroup row style={{ paddingTop: "40px" }}>
         <Label for="exampleTitle" sm={2}>
           Title
         </Label>
@@ -80,7 +88,7 @@ const EventEdit = () => {
           <Input
             id="exampleTitle"
             name="title"
-            placeholder="title"
+            placeholder="Morning Bike Ride Meetup"
             type="text"
             value={formData.title}
             onChange={handleChange}
@@ -95,11 +103,36 @@ const EventEdit = () => {
           <Input
             id="exampleDescription"
             name="description"
-            placeholder="description"
+            placeholder="Join us for a fun and refreshing morning bike ride around the city."
             type="text"
             value={formData.description}
             onChange={handleChange}
           />
+        </Col>
+      </FormGroup>
+      <FormGroup row>
+        <Label for="examplePfpUrl" sm={2}>
+          Event Main Photo
+        </Label>
+        <Col sm={7}>
+          <Input
+            id="imageFile"
+            name="imageFile"
+            type="file"
+            disabled={isImageRemoved}
+            onChange={handleUploadImage}
+          />
+        </Col>
+        <Col sm={3}>
+          <FormGroup
+            check
+            inline
+          >
+            <Input type="checkbox" onChange={(e) => setIsImageRemoved(e.target.checked)} />
+            <Label check>
+              Remove Image
+            </Label>
+          </FormGroup>
         </Col>
       </FormGroup>
       <FormGroup row>
@@ -110,7 +143,7 @@ const EventEdit = () => {
           <Input
             id="exampleLocation"
             name="location"
-            placeholder="location"
+            placeholder="Neptune's Net, Malibu"
             type="text"
             value={formData.location}
             onChange={handleChange}
@@ -136,16 +169,13 @@ const EventEdit = () => {
             timeIntervals={15}
           />
         </Col>
-      </FormGroup>
-      <FormGroup check row>
-        <Col
-          sm={{
-            offset: 2,
-            size: 10,
-          }}
-        >
-          <Button>Save changes</Button>
-        </Col>
+        <div style={{ paddingTop: "20px" }}>
+          <Col>
+            <Button color="warning" className="yellow-button">
+              Save changes
+            </Button>
+          </Col>
+        </div>
       </FormGroup>
       {isSuccess && (
         <div class="alert alert-success" role="alert">

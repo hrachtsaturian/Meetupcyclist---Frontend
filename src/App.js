@@ -132,6 +132,10 @@ const App = () => {
                   element={<ProtectedRoute element={<GroupEdit />} />}
                 />
                 <Route
+                  path="/groups/:id/newevent"
+                  element={<ProtectedRoute element={<EventNew />} />}
+                />
+                <Route
                   path="/locations"
                   element={<ProtectedRoute element={<Locations />} />}
                 />

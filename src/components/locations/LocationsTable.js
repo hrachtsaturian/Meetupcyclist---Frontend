@@ -8,7 +8,7 @@ const LocationsTable = ({ locations }) => {
         ? locations.map((location) => (
             <LocationRow key={location.id} location={location} />
           ))
-        : "No results"}
+        : "No locations yet"}
     </div>
   );
 };

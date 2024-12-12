@@ -1,14 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Form, FormGroup, Label, Input, Button, Col } from "reactstrap";
+import { useNavigate } from "react-router-dom";
 import UsersAPI from "../../api/UsersAPI";
 import Context from "../Context";
+import { Form, FormGroup, Label, Input, Button, Col } from "reactstrap";
+import { uploadImage } from "../../helpers/helpers";
 
 const ProfileEdit = () => {
   const { currentUser = {}, setCurrentUser } = useContext(Context);
 
   const [formData, setFormData] = useState({});
+  const [isImageRemoved, setIsImageRemoved] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState();
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const { firstName, lastName, email, password, pfpUrl, bio } = currentUser;
@@ -32,21 +37,25 @@ const ProfileEdit = () => {
     try {
       const updatedUser = await UsersAPI.updateProfile(
         currentUser.id,
-        formData
+        { ...formData, pfpUrl: isImageRemoved ? '' : formData.pfpUrl }
       );
       setCurrentUser(updatedUser);
-      setIsSuccess(true);
-      setError();
+      navigate(`/users/${currentUser.id}`);
     } catch (error) {
-      setError(error || 'Failed to update profile');
+      setError(error?.message || 'Failed to update profile');
       setIsSuccess(false);
     }
   };
 
+  const handleUploadImage = async (e) => {
+    await uploadImage(e, setFormData, setError);
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
-      <h3 className="text-center mb-4">Profile</h3>
-      <FormGroup row>
+      <h3 style={{ fontSize: "40px" }} className="text-center mb-2 meetupcyclist">Profile Update</h3>
+      <hr></hr>
+      <FormGroup row style={{ paddingTop: "40px" }}>
         <Label for="exampleFirstName" sm={2}>
           First Name
         </Label>
@@ -54,7 +63,7 @@ const ProfileEdit = () => {
           <Input
             id="exampleFirstName"
             name="firstName"
-            placeholder="first name"
+            placeholder="John"
             type="text"
             value={formData.firstName}
             onChange={handleChange}
@@ -69,7 +78,7 @@ const ProfileEdit = () => {
           <Input
             id="exampleLastName"
             name="lastName"
-            placeholder="last name"
+            placeholder="Doe"
             type="text"
             value={formData.lastName}
             onChange={handleChange}
@@ -84,7 +93,7 @@ const ProfileEdit = () => {
           <Input
             id="exampleEmail"
             name="email"
-            placeholder="email"
+            placeholder="example@email.com"
             type="email"
             value={formData.email}
             onChange={handleChange}
@@ -99,7 +108,7 @@ const ProfileEdit = () => {
           <Input
             id="examplePassword"
             name="password"
-            placeholder="password"
+            placeholder="********"
             type="password"
             value={formData.password}
             onChange={handleChange}
@@ -110,15 +119,25 @@ const ProfileEdit = () => {
         <Label for="examplePfpUrl" sm={2}>
           Profile Photo
         </Label>
-        <Col sm={10}>
+        <Col sm={7}>
           <Input
-            id="examplePfpUrl"
-            name="pfpUrl"
-            placeholder="profile photo url"
-            type="text"
-            value={formData.pfpUrl}
-            onChange={handleChange}
+            id="imageFile"
+            name="imageFile"
+            type="file"
+            disabled={isImageRemoved}
+            onChange={handleUploadImage}
           />
+        </Col>
+        <Col sm={3}>
+          <FormGroup
+            check
+            inline
+          >
+            <Input type="checkbox" onChange={(e) => setIsImageRemoved(e.target.checked)} />
+            <Label check>
+              Remove Image
+            </Label>
+          </FormGroup>
         </Col>
       </FormGroup>
       <FormGroup row>
@@ -130,23 +149,29 @@ const ProfileEdit = () => {
             id="exampleText"
             name="bio"
             type="textarea"
-            placeholder="tell us something about yourself"
+            placeholder="Tell us a little about yourself..."
             value={formData.bio}
             onChange={handleChange}
           />
         </Col>
+        <div style={{ paddingTop: "20px" }}>
+          <Col>
+            <Button color="warning" className="yellow-button">
+              Save changes
+            </Button>
+          </Col>
+        </div>
       </FormGroup>
-          <Button>Save changes</Button>
       {isSuccess && (
-          <div class="alert alert-success" role="alert">
-            Updated successfully
-          </div>
-        )}
-        {error && (
-          <div class="alert alert-danger" role="alert">
-            {error}
-          </div>
-        )}
+        <div class="alert alert-success" role="alert">
+          Updated successfully
+        </div>
+      )}
+      {error && (
+        <div class="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
     </Form>
   );
 };

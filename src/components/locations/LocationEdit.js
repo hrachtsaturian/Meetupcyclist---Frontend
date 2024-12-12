@@ -4,12 +4,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Form, FormGroup, Label, Input, Button, Col } from "reactstrap";
 import Context from "../Context";
 import Loader from "../Loader";
+import { uploadImage } from "../../helpers/helpers";
 
 const LocationEdit = () => {
   const { id } = useParams();
   const { currentUser } = useContext(Context);
 
   const [formData, setFormData] = useState({});
+  const [isImageRemoved, setIsImageRemoved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState();
@@ -19,16 +21,17 @@ const LocationEdit = () => {
   useEffect(() => {
     async function getData() {
       try {
-        const { name, description, address } = await LocationsAPI.get(id);
+        const { name, description, address, pfpUrl } = await LocationsAPI.get(id);
 
         setFormData({
           name,
           description,
           address,
+          pfpUrl
         });
         setIsLoading(false);
       } catch (error) {
-        setError(error);
+        setError(error?.message);
       }
     }
 
@@ -50,10 +53,10 @@ const LocationEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await LocationsAPI.update(id, formData);
+      await LocationsAPI.update(id, { ...formData, pfpUrl: isImageRemoved ? '' : formData.pfpUrl });
       navigate(`/locations/${id}`);
     } catch (error) {
-      setError(error || "Failed to update location");
+      setError(error?.message || "Failed to update location");
       setIsSuccess(false);
     }
   };
@@ -62,10 +65,15 @@ const LocationEdit = () => {
     return <Loader />;
   }
 
+  const handleUploadImage = async (e) => {
+    await uploadImage(e, setFormData, setError);
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
-      <h3 className="text-center mb-4">Location Update</h3>
-      <FormGroup row>
+      <h3 style={{ fontSize: "40px" }} className="text-center mb-2 meetupcyclist">Location Update</h3>
+      <hr></hr>
+      <FormGroup row style={{ paddingTop: "40px" }}>
         <Label for="exampleName" sm={2}>
           Name
         </Label>
@@ -96,6 +104,31 @@ const LocationEdit = () => {
         </Col>
       </FormGroup>
       <FormGroup row>
+        <Label for="examplePfpUrl" sm={2}>
+          Location Main Photo
+        </Label>
+        <Col sm={7}>
+          <Input
+            id="imageFile"
+            name="imageFile"
+            type="file"
+            disabled={isImageRemoved}
+            onChange={handleUploadImage}
+          />
+        </Col>
+        <Col sm={3}>
+          <FormGroup
+            check
+            inline
+          >
+            <Input type="checkbox" onChange={(e) => setIsImageRemoved(e.target.checked)} />
+            <Label check>
+              Remove Image
+            </Label>
+          </FormGroup>
+        </Col>
+      </FormGroup>
+      <FormGroup row>
         <Label for="exampleAddress" sm={2}>
           Address
         </Label>
@@ -109,16 +142,13 @@ const LocationEdit = () => {
             onChange={handleChange}
           />
         </Col>
-      </FormGroup>
-      <FormGroup check row>
-        <Col
-          sm={{
-            offset: 2,
-            size: 10,
-          }}
-        >
-          <Button>Save changes</Button>
-        </Col>
+        <div style={{ paddingTop: "20px" }}>
+          <Col>
+            <Button color="warning" className="yellow-button">
+              Save changes
+            </Button>
+          </Col>
+        </div>
       </FormGroup>
       {isSuccess && (
         <div class="alert alert-success" role="alert">
