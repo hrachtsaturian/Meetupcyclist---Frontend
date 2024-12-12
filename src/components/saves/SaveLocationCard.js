@@ -1,15 +1,30 @@
 import React from "react";
+import LocationsAPI from "../../api/LocationsAPI";
 import { Link } from "react-router-dom";
 import {
-  Button,
   Card,
   CardBody,
   CardSubtitle,
-  CardText,
   CardTitle,
+  Col,
+  UncontrolledTooltip,
 } from "reactstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBookmark } from "@fortawesome/free-solid-svg-icons";
+import LocationIcon from "../../images/location_icon_default.png";
 
-const SaveLocationCard = ({ location }) => {
+const SaveLocationCard = ({ location, getSaves, setLoading }) => {
+  const handleUnsave = async (e) => {
+    e.preventDefault(); // Prevent navigation due to card link
+    setLoading(true);
+    try {
+      await LocationsAPI.removeSave(location.id);
+      await getSaves();
+    } catch (error) {
+      console.error("Error unsaving the location:", error);
+    }
+  };
+
   return (
     <Card
       style={{
@@ -18,14 +33,33 @@ const SaveLocationCard = ({ location }) => {
       tag={Link}
       to={`/locations/${location.id}`}
     >
-      <img alt="Sample" src="https://picsum.photos/300/200" />
+      <img
+        src={location.pfpUrl || LocationIcon}
+        alt="location-main-photo"
+      />
       <CardBody>
-        <CardTitle tag="h5">{location.name}</CardTitle>
-        <CardSubtitle className="mb-2 text-muted" tag="h6">
-          {location.address}
+        <CardTitle className="fs-4">{location.name}</CardTitle>
+        <CardSubtitle>
+          Created by: {location.firstName} {location.lastName}
         </CardSubtitle>
-        <CardText>{location.description}</CardText>
-        <Button>Button</Button>
+        <Col style={{ paddingTop: "10px" }}>
+          <div
+            id={`unsaveIcon-${location.id}`}
+            style={{
+              cursor: "pointer",
+              display: "inline-block",
+            }}
+            onClick={handleUnsave}
+          >
+            <FontAwesomeIcon icon={faBookmark} className="fa-xl" />
+            <UncontrolledTooltip
+              placement="top"
+              target={`unsaveIcon-${location.id}`}
+            >
+              Unsave
+            </UncontrolledTooltip>
+          </div>
+        </Col>
       </CardBody>
     </Card>
   );

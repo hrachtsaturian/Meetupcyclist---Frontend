@@ -7,18 +7,17 @@ const JoinedGroups = () => {
   const [joinedGroups, setJoinedGroups] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function getJoinedGroups() {
-      try {
-        const groups = await GroupsAPI.getAll({ showJoinedGroups: true });
-        setJoinedGroups(groups);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching joined groups:", err);
-        setLoading(false);
-      }
+  async function getJoinedGroups() {
+    try {
+      const groups = await GroupsAPI.getAll({ isJoined: true });
+      setJoinedGroups(groups);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching joined groups:", err);
     }
+  }
 
+  useEffect(() => {
     getJoinedGroups();
   }, []);
 
@@ -28,8 +27,13 @@ const JoinedGroups = () => {
 
   return (
     <>
-      <h3 className="text-center mb-4">My Groups</h3>
-      <JoinedGroupsTable joinedGroups={joinedGroups} />
+      <h3 style={{fontSize: "40px" }}className="text-center mb-2 meetupcyclist">My Groups</h3>
+      <hr></hr>
+      <JoinedGroupsTable
+        joinedGroups={joinedGroups}
+        getJoinedGroups={getJoinedGroups}
+        setLoading={setLoading}
+      />
     </>
   );
 };

@@ -9,20 +9,28 @@ const AttendingEventsTable = ({
   return (
     <div
       className="attendingEvents-table"
-      style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "16px",
+        justifyContent: "center",
+        paddingTop: "20px",
+      }}
     >
       {attendingEvents.length === 0 ? (
-        <p>You have no attending events yet.</p>
+        <p>You have nothing yet.</p>
       ) : (
         <>
-          {attendingEvents.map((attendingEvent, i) => (
-            <AttendingEventCard
-              key={i}
-              attendingEvent={attendingEvent}
-              getAttendingEvents={getAttendingEvents}
-              setLoading={setLoading}
-            />
-          ))}
+          {attendingEvents.map((attendingEvent, i) => {
+            return (
+              <AttendingEventCard
+                key={i}
+                attendingEvent={attendingEvent}
+                getAttendingEvents={getAttendingEvents}
+                setLoading={setLoading}
+              />
+            );
+          })}
         </>
       )}
     </div>

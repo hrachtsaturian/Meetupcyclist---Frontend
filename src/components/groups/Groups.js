@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import GroupsAPI from "../../api/GroupsAPI";
 import GroupsTable from "./GroupsTable";
+import SearchBar from "../SearchBar";
 import Loader from "../Loader";
 import { Link } from "react-router-dom";
 import { Button, Col } from "reactstrap";
 
 const Groups = () => {
   const [groups, setGroups] = useState([]);
-  console.log({ groups });
+  const [filteredGroups, setFilteredGroups] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
 
@@ -15,9 +16,10 @@ const Groups = () => {
     try {
       const res = await GroupsAPI.getAll();
       setGroups(res);
+      setFilteredGroups(res);
       setIsLoading(false);
     } catch (error) {
-      setError(error || "Failed to find groups");
+      setError(error?.message || "Failed to find groups");
     }
   }
 
@@ -40,16 +42,34 @@ const Groups = () => {
   return (
     <div className="groups-page">
       <div className="groups-table-container">
-        <h3 className="text-center mb-4">Groups</h3>
-        <GroupsTable groups={groups} />
-      </div>
-      <div className="create-group-container">
-        <h4>Would like to create a new group?</h4>
-        <Link to="/groups/new">
-          <Col>
-            <Button>Create</Button>
-          </Col>
-        </Link>
+        <h3
+          style={{ fontSize: "40px" }}
+          className="text-center mb-2 meetupcyclist"
+        >
+          Groups
+        </h3>
+        <div
+          style={{
+            display: "flex",
+            gap: "40px",
+            justifyContent: "space-between",
+          }}
+        >
+          <SearchBar
+            data={groups}
+            searchField="name"
+            placeholder="Search groups..."
+            onSearchResults={setFilteredGroups}
+          />
+          <Link to="/groups/new">
+            <Col>
+              <Button color="warning" className="yellow-button">
+                Create Group
+              </Button>
+            </Col>
+          </Link>
+        </div>
+        <GroupsTable groups={filteredGroups} />
       </div>
     </div>
   );

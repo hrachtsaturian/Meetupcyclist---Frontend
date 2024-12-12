@@ -24,13 +24,13 @@ const Login = ({ login }) => {
       navigate("/");
     } catch (error) {
       console.log(error);
-      setError(error || "Failed to sign in");
+      setError(error?.message || "Failed to sign in");
     }
   };
   return (
     <div className="loginPage">
       <Form onSubmit={handleSubmit} className="loginForm">
-        <h3 className="text-center mb-4">Log In</h3>
+        <h3 style={{fontSize: "40px" }}className="text-center mb-2 meetupcyclist">Log In</h3>
         <FormGroup row>
           <Label for="exampleEmail" sm={2}>
             Email
@@ -39,7 +39,7 @@ const Login = ({ login }) => {
             <Input
               id="exampleEmail"
               name="email"
-              placeholder="email"
+              placeholder="example@email.com"
               type="email"
               onChange={handleChange}
             />
@@ -53,7 +53,7 @@ const Login = ({ login }) => {
             <Input
               id="examplePassword"
               name="password"
-              placeholder="password"
+              placeholder="********"
               type="password"
               onChange={handleChange}
             />
@@ -61,7 +61,7 @@ const Login = ({ login }) => {
         </FormGroup>
         <FormGroup check row>
           <Col>
-            <Button>Submit</Button>
+            <Button color="warning" className="yellow-button">Submit</Button>
           </Col>
         </FormGroup>
         {error && (

@@ -74,7 +74,25 @@ html {
   padding-top: 150px;
   height: 100vh;
   overflow: auto;
-  text-align: center;
+}
+
+.icon-button-row {
+  display: flex;
+  justify-content: center; /* Ensures alignment in the center */
+  align-items: center;
+  gap: 20px; /* Uniform spacing between elements */
+}
+
+.icon-wrapper {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yellow-button {
+  padding: 8px 16px; /* Adjust button padding for visual balance */
+  margin: 0; /* Ensure no extra margin is added */
 }
 
 .event-header,
@@ -91,7 +109,6 @@ html {
 .locations-table {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 .events-table-row,
@@ -121,12 +138,11 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f5f5f5;
 }
 
 .leftSide img {
-  max-width: 80%;
-  max-height: 80%;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .rightSide {
@@ -193,17 +209,14 @@ html {
 .locations-page {
   display: flex;
   flex-direction: row;
-  width: 100%;
-  height: 100vh;
+  justify-content: center;
 }
 
 .events-table-container,
 .groups-table-container,
 .locations-table-container {
-  flex: 4;
   padding: 1rem;
   overflow-x: auto;
-  border-right: 1px solid #ddd;
 }
 
 .create-event-container,
@@ -213,17 +226,51 @@ html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: start;
   padding: 1rem;
 }
 
 .navbar {
+  background-color: #333;
+  color: white;
+  background: linear-gradient(to right, rgb(255, 255, 255) 15%, #f9b41f 85%); 
+  padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  background-color: #333;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
   color: white;
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}
+
+.meetupcyclist {
+  font-family: "Bebas Neue", sans-serif;
+  font-weight: 400;
+  font-size: 60px;
+  color: black;
+  font-style: normal;
+
 }
 
 .navbar .dropdown {
@@ -280,3 +327,6 @@ a {
   color: inherit;
 }
 
+.yellow-button:hover {
+  color: white;
+}

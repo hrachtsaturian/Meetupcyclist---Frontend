@@ -1,15 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
 import GroupsAPI from "../../api/GroupsAPI";
 import { useNavigate, useParams } from "react-router-dom";
-import { Form, FormGroup, Label, Input, Button, Col } from "reactstrap";
+import { Form, FormGroup, Label, Input, Col, Button } from "reactstrap";
 import Context from "../Context";
 import Loader from "../Loader";
+import { uploadImage } from "../../helpers/helpers";
 
 const GroupEdit = () => {
   const { id } = useParams();
   const { currentUser } = useContext(Context);
 
   const [formData, setFormData] = useState({});
+  const [isImageRemoved, setIsImageRemoved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState();
@@ -19,19 +21,20 @@ const GroupEdit = () => {
   useEffect(() => {
     async function getData() {
       try {
-        const { name, description, createdBy } = await GroupsAPI.get(id);
+        const { name, description, pfpUrl, createdBy } = await GroupsAPI.get(id);
 
-        if (currentUser.id !== createdBy) {
+        if (currentUser.id !== createdBy && !currentUser.isAdmin) {
           navigate("/");
         }
 
         setFormData({
           name,
-          description
+          description,
+          pfpUrl
         });
         setIsLoading(false);
       } catch (error) {
-        setError(error);
+        setError(error?.message);
       }
     }
     if (id) {
@@ -48,12 +51,16 @@ const GroupEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await GroupsAPI.update(id, formData);
+      await GroupsAPI.update(id, { ...formData, pfpUrl: isImageRemoved ? '' : formData.pfpUrl });
       navigate(`/groups/${id}`);
     } catch (error) {
-      setError(error || "Failed to update group");
+      setError(error?.message || "Failed to update group");
       setIsSuccess(false);
     }
+  };
+
+  const handleUploadImage = async (e) => {
+    await uploadImage(e, setFormData, setError);
   };
 
   if (isLoading) {
@@ -62,8 +69,9 @@ const GroupEdit = () => {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <h3 className="text-center mb-4">Group Update</h3>
-      <FormGroup row>
+      <h3 style={{ fontSize: "40px" }} className="text-center mb-2 meetupcyclist">Group Update</h3>
+      <hr></hr>
+      <FormGroup row style={{ paddingTop: "40px" }}>
         <Label for="exampleName" sm={2}>
           Name
         </Label>
@@ -71,7 +79,7 @@ const GroupEdit = () => {
           <Input
             id="exampleName"
             name="name"
-            placeholder="name"
+            placeholder="City Cyclists Club"
             type="text"
             value={formData.name}
             onChange={handleChange}
@@ -86,22 +94,44 @@ const GroupEdit = () => {
           <Input
             id="exampleDescription"
             name="description"
-            placeholder="description"
+            placeholder="A community of cycling enthusiasts who meet regularly for group rides, events, and discussions about all things cycling. All levels welcome!"
             type="text"
             value={formData.description}
             onChange={handleChange}
           />
         </Col>
       </FormGroup>
-      <FormGroup check row>
-        <Col
-          sm={{
-            offset: 2,
-            size: 10,
-          }}
-        >
-          <Button>Save changes</Button>
+      <FormGroup row>
+        <Label for="examplePfpUrl" sm={2}>
+          Group Main Photo
+        </Label>
+        <Col sm={7}>
+          <Input
+            id="imageFile"
+            name="imageFile"
+            type="file"
+            disabled={isImageRemoved}
+            onChange={handleUploadImage}
+          />
         </Col>
+        <Col sm={3}>
+          <FormGroup
+            check
+            inline
+          >
+            <Input type="checkbox" onChange={(e) => setIsImageRemoved(e.target.checked)} />
+            <Label check>
+              Remove Image
+            </Label>
+          </FormGroup>
+        </Col>
+        <div style={{ paddingTop: "20px" }}>
+          <Col>
+            <Button color="warning" className="yellow-button">
+              Save changes
+            </Button>
+          </Col>
+        </div>
       </FormGroup>
       {isSuccess && (
         <div class="alert alert-success" role="alert">

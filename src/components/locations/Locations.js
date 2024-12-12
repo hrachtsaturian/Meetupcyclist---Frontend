@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import LocationsAPI from "../../api/LocationsAPI";
 import LocationsTable from "./LocationsTable";
+import SearchBar from "../SearchBar";
+import Context from "../Context";
 import Loader from "../Loader";
 import { Link } from "react-router-dom";
 import { Button, Col } from "reactstrap";
 
 const Locations = () => {
+  const { currentUser } = useContext(Context);
+
   const [locations, setLocations] = useState([]);
-  console.log({ locations });
+  const [filteredLocations, setFilteredLocations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
 
@@ -15,9 +19,10 @@ const Locations = () => {
     try {
       const res = await LocationsAPI.getAll();
       setLocations(res);
+      setFilteredLocations(res);
       setIsLoading(false);
     } catch (error) {
-      setError(error || "Failed to find locations");
+      setError(error?.message || "Failed to find locations");
     }
   }
 
@@ -40,15 +45,37 @@ const Locations = () => {
   return (
     <div className="locations-page">
       <div className="locations-table-container">
-        <h3 className="text-center mb-4">Locations</h3>
-        <LocationsTable locations={locations} />
-      </div>
-      <div className="create-location-container">
-        <Link to="/locations/new">
-          <Col>
-            <Button>Create a new location</Button>
-          </Col>
-        </Link>
+        <h3
+          style={{ fontSize: "40px" }}
+          className="text-center mb-2 meetupcyclist"
+        >
+          Locations
+        </h3>
+        <div
+          style={{
+            display: "flex",
+            gap: "40px",
+            justifyContent: "space-between",
+          }}
+        >
+          <SearchBar
+            data={locations}
+            searchField="name"
+            placeholder="Search locations..."
+            onSearchResults={setFilteredLocations}
+          />
+          {currentUser.isAdmin ? (
+            <Link to="/locations/new">
+              <Col>
+                <Button color="warning" className="yellow-button">
+                  Create Location
+                </Button>
+              </Col>
+              <i>*Only Admins permitted</i>
+            </Link>
+          ) : null}
+        </div>
+      <LocationsTable locations={filteredLocations} />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UsersAPI from "../../api/UsersAPI";
 import { Form, Button, Col, FormGroup, Input, Label } from "reactstrap";
+import { uploadImage } from "../../helpers/helpers";
 
 const Signup = ({ login }) => {
   const [formData, setFormData] = useState({
@@ -23,18 +24,24 @@ const Signup = ({ login }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // issue with creating user - firstName, lastName, email, and password are missing
       const token = await UsersAPI.signup(formData);
       login(token);
       navigate("/");
     } catch (error) {
       console.log(error);
-      setError(error || "Failed to sign up");
+      setError(error?.message || "Failed to sign up");
     }
   };
+
+  const handleUploadImage = async (e) => {
+    await uploadImage(e, setFormData, setError);
+  };
+
   return (
     <div className="signupPage">
       <Form onSubmit={handleSubmit} className="signupForm">
-        <h3 className="text-center mb-4">Sign Up</h3>
+        <h3 style={{fontSize: "40px" }}className="text-center mb-2 meetupcyclist">Sign Up</h3>
         <FormGroup row>
           <Label for="exampleFirstName" sm={2}>
             First Name
@@ -43,7 +50,7 @@ const Signup = ({ login }) => {
             <Input
               id="exampleFirstName"
               name="firstName"
-              placeholder="first name"
+              placeholder="John"
               type="text"
               onChange={handleChange}
             />
@@ -57,7 +64,7 @@ const Signup = ({ login }) => {
             <Input
               id="exampleLastName"
               name="lastName"
-              placeholder="last name"
+              placeholder="Doe"
               type="text"
               onChange={handleChange}
             />
@@ -71,7 +78,7 @@ const Signup = ({ login }) => {
             <Input
               id="exampleEmail"
               name="email"
-              placeholder="email"
+              placeholder="example@email.com"
               type="email"
               onChange={handleChange}
             />
@@ -85,7 +92,7 @@ const Signup = ({ login }) => {
             <Input
               id="examplePassword"
               name="password"
-              placeholder="password"
+              placeholder="********"
               type="password"
               onChange={handleChange}
             />
@@ -95,15 +102,14 @@ const Signup = ({ login }) => {
           <Label for="examplePfpUrl" sm={2}>
             Profile Photo
           </Label>
-          <Col sm={10}>
-            <Input
-              id="examplePfpUrl"
-              name="pfpUrl"
-              placeholder="profile photo URL"
-              type="text"
-              onChange={handleChange}
-            />
-          </Col>
+        <Col sm={10}>
+          <Input
+            id="imageFile"
+            name="imageFile"
+            type="file"
+            onChange={handleUploadImage}
+          />
+        </Col>
         </FormGroup>
         <FormGroup row>
           <Label for="exampleText" sm={2}>
@@ -114,14 +120,14 @@ const Signup = ({ login }) => {
               id="exampleText"
               name="bio"
               type="textarea"
-              placeholder="tell us about yourself"
+              placeholder="Tell us a little about yourself..."
               onChange={handleChange}
             />
           </Col>
         </FormGroup>
         <FormGroup check row>
           <Col>
-            <Button>Submit</Button>
+            <Button color="warning" className="yellow-button">Submit</Button>
           </Col>
         </FormGroup>
         {error && (

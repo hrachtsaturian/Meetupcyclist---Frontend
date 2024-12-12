@@ -3,75 +3,95 @@ import SavesTable from "./SavesTable";
 import EventsAPI from "../../api/EventsAPI";
 import GroupsAPI from "../../api/GroupsAPI";
 import LocationsAPI from "../../api/LocationsAPI";
-import { ButtonGroup, Button } from "reactstrap";
 import Loader from "../Loader";
+import { ButtonGroup, Button } from "reactstrap";
 
 const Saves = () => {
   const [saves, setSaves] = useState([]);
   // selector by default - events
   const [selectedFilter, setSelectedFilter] = useState("events");
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  // do we need await in front of .getAll() methods for fetching data?
-  const getSavesApiRequest = async (selectedFilter) => {
+  const getSavesApiRequest = async () => {
     if (selectedFilter === "events") {
-      return EventsAPI.getAll({ showSaves: true, showPastEvents: true });
+      const savedEvents = await EventsAPI.getAll({
+        filter: { isSaved: true },
+        sort: { date: "DESC" },
+      });
+      return savedEvents;
     }
     if (selectedFilter === "groups") {
-      return GroupsAPI.getAll({ showSaves: true });
+      const savedGroups = await GroupsAPI.getAll({ isSaved: true });
+      return savedGroups;
     }
     if (selectedFilter === "locations") {
-      return LocationsAPI.getAll({ showSaves: true });
+      const savedLocations = await LocationsAPI.getAll({ isSaved: true });
+      return savedLocations;
     }
     return [];
   };
 
-  const getSaves = async (selectedFilter) => {
+  const getSaves = async () => {
     try {
-      setIsLoading(true);
-      const saves = await getSavesApiRequest(selectedFilter);
+      setLoading(true);
+      const saves = await getSavesApiRequest();
       setSaves(saves);
-      setIsLoading(false);
+      setLoading(false);
     } catch (err) {
       console.error("Error fetching saved data:", err);
-      setIsLoading(false);
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    getSaves(selectedFilter);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    getSaves();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFilter]);
 
   return (
     <>
-      <h3 className="text-center mb-4">Saved</h3>
-      <div style={{ marginBottom: '12px' }}>
+      <h3
+        style={{ fontSize: "40px" }}
+        className="text-center mb-2 meetupcyclist"
+      >
+        Saved
+      </h3>
+      <hr></hr>
+      <div style={{ marginBottom: "12px" }}>
         <ButtonGroup>
           <Button
             onClick={() => setSelectedFilter("events")}
             active={selectedFilter === "events"}
-            color={selectedFilter === "events" ? "secondary" : "outline"}
+            color={selectedFilter === "events" ? "warning" : "outline"}
           >
             Events
           </Button>
           <Button
             onClick={() => setSelectedFilter("groups")}
             active={selectedFilter === "groups"}
-            color={selectedFilter === "groups" ? "secondary" : "outline"}
+            color={selectedFilter === "groups" ? "warning" : "outline"}
           >
             Groups
           </Button>
           <Button
             onClick={() => setSelectedFilter("locations")}
             active={selectedFilter === "locations"}
-            color={selectedFilter === "locations" ? "secondary" : "outline"}
+            color={selectedFilter === "locations" ? "warning" : "outline"}
           >
             Locations
           </Button>
         </ButtonGroup>
       </div>
-      {isLoading ? <Loader /> : <SavesTable saves={saves} selectedFilter={selectedFilter}/>}
+      {loading ? (
+        <Loader />
+      ) : (
+        <SavesTable
+          saves={saves}
+          selectedFilter={selectedFilter}
+          getSaves={getSaves}
+          setLoading={setLoading}
+        />
+      )}
     </>
   );
 };

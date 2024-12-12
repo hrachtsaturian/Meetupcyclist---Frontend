@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { Form, Button, Col, FormGroup, Input, Label } from "reactstrap";
 import { useNavigate } from "react-router-dom";
+import { Form, Col, FormGroup, Input, Label, Button } from "reactstrap";
 import GroupsAPI from "../../api/GroupsAPI";
+import { uploadImage } from "../../helpers/helpers";
 
 const GroupNew = () => {
   const [formData, setFormData] = useState({
     name: "",
-    description: ""
+    description: "",
+    pfpUrl: ""
   });
   const [error, setError] = useState();
   const navigate = useNavigate();
@@ -19,17 +21,29 @@ const GroupNew = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await GroupsAPI.create(formData);
-      navigate("/groups");
+      // issue with creating group - name and description are missing
+      const newGroup = await GroupsAPI.create(formData);
+      navigate(`/groups/${newGroup.id}`);
     } catch (error) {
       console.log(error);
-      setError(error || "Failed to create group");
+      setError(error?.message || "Failed to create group");
     }
   };
+
+  const handleUploadImage = async (e) => {
+    await uploadImage(e, setFormData, setError);
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
-      <h3 className="text-center mb-4">New Group</h3>
-      <FormGroup row>
+      <h3
+        style={{ fontSize: "40px" }}
+        className="text-center mb-2 meetupcyclist"
+      >
+        New Group
+      </h3>
+      <hr></hr>
+      <FormGroup row style={{ paddingTop: "40px" }}>
         <Label for="exampleName" sm={2}>
           Name
         </Label>
@@ -37,7 +51,7 @@ const GroupNew = () => {
           <Input
             id="exampleName"
             name="name"
-            placeholder="name"
+            placeholder="City Cyclists Club"
             type="text"
             value={formData.name}
             onChange={handleChange}
@@ -52,14 +66,33 @@ const GroupNew = () => {
           <Input
             id="exampleDescription"
             name="description"
-            placeholder="description"
+            placeholder="A community of cycling enthusiasts who meet regularly for group rides, events, and discussions about all things cycling. All levels welcome!"
             type="text"
             value={formData.description}
             onChange={handleChange}
           />
         </Col>
       </FormGroup>
-      <Button>Submit</Button>
+      <FormGroup row>
+        <Label for="examplePfpUrl" sm={2}>
+          Group Main Photo
+        </Label>
+        <Col sm={10}>
+          <Input
+            id="imageFile"
+            name="imageFile"
+            type="file"
+            onChange={handleUploadImage}
+          />
+        </Col>
+        <div style={{ paddingTop: "20px" }}>
+          <Col>
+            <Button color="warning" className="yellow-button">
+              Submit
+            </Button>
+          </Col>
+        </div>
+      </FormGroup>
       {error && (
         <div class="alert alert-danger" role="alert">
           {error}

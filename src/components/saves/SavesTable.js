@@ -3,22 +3,52 @@ import SaveEventCard from "./SaveEventCard";
 import SaveGroupCard from "./SaveGroupCard";
 import SaveLocationCard from "./SaveLocationCard";
 
-const SavesTable = ({ saves, selectedFilter }) => {
+const SavesTable = ({ saves, selectedFilter, getSaves, setLoading }) => {
   return (
-    <div className="saves-table" style={{ display: 'flex',  flexWrap: 'wrap', gap: '16px' }}>
+    <div
+      className="saves-table"
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "16px",
+        justifyContent: "center",
+        paddingTop: "20px"
+      }}
+    >
       {saves.length === 0 ? (
         <p>You have nothing saved yet.</p>
       ) : (
         <>
-          {saves.map((save) => {
+          {saves.map((save, i) => {
             if (selectedFilter === "events") {
-              return <SaveEventCard event={save} />;
+              return (
+                <SaveEventCard
+                  key={i}
+                  event={save}
+                  getSaves={getSaves}
+                  setLoading={setLoading}
+                />
+              );
             }
             if (selectedFilter === "groups") {
-              return <SaveGroupCard group={save} />;
+              return (
+                <SaveGroupCard
+                  key={i}
+                  group={save}
+                  getSaves={getSaves}
+                  setLoading={setLoading}
+                />
+              );
             }
             if (selectedFilter === "locations") {
-              return <SaveLocationCard location={save} />;
+              return (
+                <SaveLocationCard
+                  key={i}
+                  location={save}
+                  getSaves={getSaves}
+                  setLoading={setLoading}
+                />
+              );
             }
             return null;
           })}

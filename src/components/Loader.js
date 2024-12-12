@@ -6,10 +6,10 @@ const Loader = () => {
     <main>
       <Card>
         <CardBody>
-          <div
+          <div className="meetupcyclist"
             style={{
-              color: "black",
-              fontSize: "24px",
+              fontSize: "40px",
+              color: "black"
             }}
           >
             Loading &hellip;

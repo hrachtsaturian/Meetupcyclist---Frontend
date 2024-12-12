@@ -1,3 +1,4 @@
+import qs from "qs";
 import BaseAPI from "./BaseAPI";
 
 /**
@@ -20,11 +21,19 @@ class EventsAPI extends BaseAPI {
   }
 
   static async getAll({
-    showAttendingEvents = false,
-    showSaves = false,
-    showPastEvents = false,
+    filter: {
+      isSaved = false,
+      isAttending = false,
+      minDate = null,
+      maxDate = null,
+      createdBy = null
+    } = {},
+    sort: { date = "ASC" } = {},
   } = {}) {
-    const query = new URLSearchParams({ showAttendingEvents, showSaves, showPastEvents });
+    const query = qs.stringify({
+      filter: { isSaved, isAttending, minDate, maxDate, createdBy },
+      sort: { date },
+    });
     const res = await this.request({ path: `events?${query.toString()}` });
     return res.data;
   }
@@ -45,6 +54,12 @@ class EventsAPI extends BaseAPI {
     });
   }
 
+    // get event attendees // GET events/:id/attendees
+    static async getAttendees(id) {
+      const res = await this.request({ path: `events/${id}/attendees` });
+      return res.data;
+    }
+
   // attend // POST events/:id/attendance
   static async attend(eventId) {
     await this.request({
@@ -57,6 +72,22 @@ class EventsAPI extends BaseAPI {
   static async unattend(eventId) {
     await this.request({
       path: `events/${eventId}/attendance`,
+      method: "delete",
+    });
+  }
+
+  // attach // POST events/:id/groups/:id
+  static async attach(eventId, groupId) {
+    await this.request({
+      path: `events/${eventId}/groups/${groupId}`,
+      method: "post",
+    });
+  }
+
+  // remove // DELETE events/:id/groups/:id
+  static async remove(eventId, groupId) {
+    await this.request({
+      path: `events/${eventId}/groups/${groupId}`,
       method: "delete",
     });
   }

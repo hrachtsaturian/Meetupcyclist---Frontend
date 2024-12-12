@@ -1,15 +1,29 @@
 import React from "react";
-import JoinedGroupRow from "./JoinedGroupCard";
+import JoinedGroupCard from "./JoinedGroupCard";
 
-const JoinedGroupsTable = ({ joinedGroups }) => {
+const JoinedGroupsTable = ({ joinedGroups, getJoinedGroups, setLoading }) => {
   return (
-    <div className="joinedGroups-table" style={{ display: 'flex',  flexWrap: 'wrap', gap: '16px' }}>
+    <div
+      className="joinedGroups-table"
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "16px",
+        justifyContent: "center",
+        paddingTop: "20px",
+      }}
+    >
       {joinedGroups.length === 0 ? (
         <p>You have not joined any groups yet.</p>
       ) : (
         <>
-          {joinedGroups.map((joinedGroup) => (
-            <JoinedGroupRow joinedGroup={joinedGroup} />
+          {joinedGroups.map((joinedGroup, i) => (
+            <JoinedGroupCard
+              key={i}
+              joinedGroup={joinedGroup}
+              getJoinedGroups={getJoinedGroups}
+              setLoading={setLoading}
+            />
           ))}
         </>
       )}

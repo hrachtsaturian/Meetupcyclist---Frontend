@@ -6,11 +6,12 @@ import BaseAPI from "./BaseAPI";
  */
 class LocationsAPI extends BaseAPI {
   static async create(data) {
-    await this.request({
+    const res = await this.request({
       path: `locations`,
       data,
       method: "post",
     });
+    return res.data;
   }
 
   static async get(id) {
@@ -18,8 +19,8 @@ class LocationsAPI extends BaseAPI {
     return res.data;
   }
 
-  static async getAll({ showSaves = false } = {}) {
-    const query = new URLSearchParams({ showSaves });
+  static async getAll({ isSaved = false } = {}) {
+    const query = new URLSearchParams({ isSaved });
     const res = await this.request({ path: `locations?${query.toString()}` });
     return res.data;
   }
