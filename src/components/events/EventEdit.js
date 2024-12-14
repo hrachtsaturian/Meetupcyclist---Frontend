@@ -143,7 +143,7 @@ const EventEdit = () => {
           <Input
             id="exampleLocation"
             name="location"
-            placeholder="Neptune's Net, Malibu"
+            placeholder="Use exact location"
             type="text"
             value={formData.location}
             onChange={handleChange}

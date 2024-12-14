@@ -40,6 +40,7 @@ const EventRow = ({ event }) => {
           }
           style={{
             width: '200px',
+            height: '200px',
             objectFit: 'contain'
           }}
         />

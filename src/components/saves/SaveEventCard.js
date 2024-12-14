@@ -35,10 +35,17 @@ const SaveEventCard = ({ event, getSaves, setLoading }) => {
       tag={Link}
       to={`/events/${event.id}`}
     >
-      <img
-        src={event.pfpUrl || EventIcon}
-        alt="event-main-photo"
-      />
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <img
+          src={event.pfpUrl || EventIcon}
+          alt="event-main-photo"
+          style={{
+            width: '200px',
+            height: '200px',
+            objectFit: "contain",
+          }}
+        />
+      </div>
       <CardBody>
         <CardText>
           <b>

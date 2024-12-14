@@ -105,6 +105,22 @@ class GroupsAPI extends BaseAPI {
     });
   }
 
+  // linkEvent // POST groups/:id/events/:id?/link
+  static async linkEvent(groupId, eventId) {
+    await this.request({
+      path: `groups/${groupId}/events/${eventId}/link`,
+      method: "post",
+    });
+  }
+
+  // unlinkEvent // DELETE groups/:id/events/:id?/unlink
+  static async unlinkEvent(groupId, eventId) {
+    await this.request({
+      path: `groups/${groupId}/events/${eventId}/unlink`,
+      method: "delete",
+    });
+  }
+
   // addSave // POST groups/:id/saved
   static async makeSave(groupId) {
     const res = await this.request({
@@ -121,22 +137,5 @@ class GroupsAPI extends BaseAPI {
       method: "delete",
     });
   }
-
-  // linkEvent // POST groups/:id/events/:id?/link
-  static async linkEvent(groupId, eventId) {
-    await this.request({
-      path: `groups/${groupId}/events/${eventId}/link`,
-      method: "post",
-    });
-  }
-
-  // unlinkEvent // DELETE groups/:id/events/:id?/unlink
-  static async unlinkEvent(groupId, eventId) {
-    await this.request({
-      path: `groups/${groupId}/events/${eventId}/unlink`,
-      method: "delete",
-    });
-  }
 }
-
 export default GroupsAPI;

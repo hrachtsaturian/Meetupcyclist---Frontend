@@ -33,10 +33,17 @@ const SaveLocationCard = ({ location, getSaves, setLoading }) => {
       tag={Link}
       to={`/locations/${location.id}`}
     >
-      <img
-        src={location.pfpUrl || LocationIcon}
-        alt="location-main-photo"
-      />
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <img
+          src={location.pfpUrl || LocationIcon}
+          alt="location-main-photo"
+          style={{
+            width: '200px',
+            height: '200px',
+            objectFit: "contain",
+          }}
+        />
+      </div>
       <CardBody>
         <CardTitle className="fs-4">{location.name}</CardTitle>
         <CardSubtitle>

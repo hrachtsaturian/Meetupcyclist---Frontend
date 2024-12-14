@@ -39,13 +39,14 @@ import ProfileIcon from "../../images/profile_icon_default.png";
 import EventIcon from "../../images/event_icon_default.png";
 import GroupIcon from "../../images/group_icon_default.png";
 import EventsAPI from "../../api/EventsAPI";
+import PostsTable from "../shared/PostsTable";
+import GroupPostCard from "./GroupPostCard";
 import { formatData } from "../../helpers/helpers";
-import GroupPostsTable from "../posts/GroupPostsTable";
 
 const Group = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { currentUser } = useContext(Context);
+  const navigate = useNavigate();
 
   const [group, setGroup] = useState();
   const [groupEvents, setGroupEvents] = useState([]);
@@ -151,6 +152,7 @@ const Group = () => {
     }
   };
 
+  // do we need loading state to prevent double click?
   const toggleMembership = async () => {
     try {
       if (isJoined) {
@@ -166,6 +168,7 @@ const Group = () => {
     }
   };
 
+  // do we need loading state to prevent double click?
   const toggleSave = async () => {
     try {
       if (isSaved) {
@@ -226,7 +229,7 @@ const Group = () => {
                 src={group.pfpUrl || GroupIcon}
                 alt="group-main-photo"
                 className="rounded-top-4"
-                style={{ height: "300px", objectFit: "contain" }}
+                style={{ height: "200px", objectFit: "contain" }}
               />
               <CardBody>
                 <div className="icon-button-row">
@@ -335,10 +338,9 @@ const Group = () => {
             </div>
           </Col>
         </Row>
-
+        {/* Members Section */}
         <Row className="mt-4">
           <Col md="4">
-            {/* Members Section */}
             <div style={{ padding: "12px" }}>
               <CardTitle tag="h4" style={{ marginBottom: "8px" }}>
                 Members: {members?.length || 0}
@@ -373,7 +375,7 @@ const Group = () => {
                 })}
               </div>
             </div>
-            {/* Group events Section */}
+            {/* Group Events Section */}
             <div style={{ padding: "12px" }}>
               <CardTitle tag="h4" style={{ marginBottom: "8px" }}>
                 Upcoming group events: {groupEvents.length}
@@ -425,7 +427,7 @@ const Group = () => {
               })}
             </div>
           </Col>
-          {/* Group Posts */}
+          {/* Group Posts Section */}
           <Col md="8">
             <div style={{ padding: "12px" }}>
               <CardTitle tag="h4" style={{ marginBottom: "8px" }}>
@@ -455,7 +457,7 @@ const Group = () => {
                   </div>
                 </FormGroup>
               </Form>
-              <GroupPostsTable groupPosts={posts} groupAdminId={group.createdBy} getPosts={getGroupPosts} />
+              <PostsTable posts={posts} getPosts={getGroupPosts} CardComponent={GroupPostCard} />
             </div>
           </Col>
         </Row>

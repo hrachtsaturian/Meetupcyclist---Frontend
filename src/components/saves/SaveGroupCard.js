@@ -33,10 +33,17 @@ const SaveGroupCard = ({ group, getSaves, setLoading }) => {
       tag={Link}
       to={`/groups/${group.id}`}
     >
-      <img
-        src={group.pfpUrl || GroupIcon}
-        alt="group-main-photo"
-      />
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <img
+          src={group.pfpUrl || GroupIcon}
+          alt="group-main-photo"
+          style={{
+            width: '200px',
+            height: '200px',
+            objectFit: "contain",
+          }}
+        />
+      </div>
       <CardBody>
         <CardTitle className="fs-4">{group.name}</CardTitle>
         <CardSubtitle>

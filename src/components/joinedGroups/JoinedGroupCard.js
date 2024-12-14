@@ -36,24 +36,33 @@ const JoinedGroupCard = ({ joinedGroup, getJoinedGroups, setLoading }) => {
       tag={Link}
       to={`/groups/${joinedGroup.id}`}
     >
-      <img
-        alt="group-main-photo"
-        src={joinedGroup.pfpUrl || GroupIcon}
-      />
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <img
+          alt="group-main-photo"
+          src={joinedGroup.pfpUrl || GroupIcon}
+          style={{
+            width: '200px',
+            height: '200px',
+            objectFit: 'contain'
+          }}
+        />
+      </div>
       <CardBody>
         <CardTitle className="fs-4">{joinedGroup.name}</CardTitle>
         <CardSubtitle>
           Founder: {joinedGroup.firstName} {joinedGroup.lastName}
         </CardSubtitle>
-        {!isGroupAdmin && <Col style={{ paddingTop: "10px" }}>
-          <Button
-            color="warning"
-            className="yellow-button"
-            onClick={handleLeave}
-          >
-            Leave
-          </Button>
-        </Col>}
+        {!isGroupAdmin &&
+          <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
+            <Button
+              color="warning"
+              className="yellow-button"
+              onClick={handleLeave}
+            >
+              Leave
+            </Button>
+          </div>
+        }
       </CardBody>
     </Card>
   );

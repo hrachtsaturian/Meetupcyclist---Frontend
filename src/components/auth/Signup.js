@@ -126,8 +126,10 @@ const Signup = ({ login }) => {
           </Col>
         </FormGroup>
         <FormGroup check row>
-          <Col>
-            <Button color="warning" className="yellow-button">Submit</Button>
+          <Col sm={11}>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Button color="warning" className="yellow-button">Submit</Button>
+            </div>
           </Col>
         </FormGroup>
         {error && (

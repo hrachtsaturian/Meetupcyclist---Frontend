@@ -36,6 +36,7 @@ const LocationRow = ({ location }) => {
           src={location.pfpUrl || LocationIcon}
           style={{
             width: "200px",
+            height: '200px',
             objectFit: "contain",
           }}
         />
