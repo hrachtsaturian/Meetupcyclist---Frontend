@@ -30,7 +30,7 @@ const Login = ({ login }) => {
   return (
     <div className="loginPage">
       <Form onSubmit={handleSubmit} className="loginForm">
-        <h3 style={{fontSize: "40px" }}className="text-center mb-2 meetupcyclist">Log In</h3>
+        <h3 style={{ fontSize: "40px" }} className="text-center mb-2 meetupcyclist">Log In</h3>
         <FormGroup row>
           <Label for="exampleEmail" sm={2}>
             Email
@@ -60,8 +60,10 @@ const Login = ({ login }) => {
           </Col>
         </FormGroup>
         <FormGroup check row>
-          <Col>
-            <Button color="warning" className="yellow-button">Submit</Button>
+          <Col sm={11}>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Button color="warning" className="yellow-button">Submit</Button>
+            </div>
           </Col>
         </FormGroup>
         {error && (

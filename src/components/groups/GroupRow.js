@@ -37,7 +37,8 @@ const EventRow = ({ group }) => {
           src={group.pfpUrl || GroupIcon}
           style={{
             width: '200px',
-            objectFit: 'contain'
+            height: '200px',
+            objectFit: 'contain',
           }}
         />
         <CardBody style={{ position: "relative", textAlign: 'left' }}>

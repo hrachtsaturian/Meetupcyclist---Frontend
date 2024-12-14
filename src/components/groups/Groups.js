@@ -62,11 +62,9 @@ const Groups = () => {
             onSearchResults={setFilteredGroups}
           />
           <Link to="/groups/new">
-            <Col>
               <Button color="warning" className="yellow-button">
                 Create Group
               </Button>
-            </Col>
           </Link>
         </div>
         <GroupsTable groups={filteredGroups} />

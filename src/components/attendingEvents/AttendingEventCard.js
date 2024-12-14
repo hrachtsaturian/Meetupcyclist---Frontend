@@ -8,7 +8,6 @@ import {
   CardSubtitle,
   CardText,
   CardTitle,
-  Col,
 } from "reactstrap";
 import { formatData, isPastEvent } from "../../helpers/helpers";
 import EventIcon from "../../images/event_icon_default.png";
@@ -37,11 +36,18 @@ const AttendingEventCard = ({
       tag={Link}
       to={`/events/${attendingEvent.id}`}
     >
-      <img
-        alt="event-main-photo"
-        src={attendingEvent.pfpUrl || EventIcon
-        }
-      />
+      <div style={{ justifyContent: "center", display: "flex" }}>
+        <img
+          alt="event-main-photo"
+          src={attendingEvent.pfpUrl || EventIcon
+          }
+          style={{
+            width: '200px',
+            height: '200px',
+            objectFit: 'contain'
+          }}
+        />
+      </div>
       <CardBody>
         <CardText>
           <b>
@@ -54,7 +60,7 @@ const AttendingEventCard = ({
         <CardSubtitle>
           Organizer: {attendingEvent.firstName} {attendingEvent.lastName}
         </CardSubtitle>
-        <Col style={{ paddingTop: "10px" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
           {!isPastEvent(attendingEvent) && (
             <Button
               color="warning"
@@ -64,7 +70,7 @@ const AttendingEventCard = ({
               Unattend
             </Button>
           )}
-        </Col>
+        </div>
       </CardBody>
     </Card>
   );

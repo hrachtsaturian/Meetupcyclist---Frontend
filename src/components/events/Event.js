@@ -17,6 +17,10 @@ import {
   Badge,
   CardSubtitle,
   UncontrolledTooltip,
+  Label,
+  Form,
+  FormGroup,
+  Input,
 } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -25,65 +29,56 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { faBookmark as faRegularBookmark } from "@fortawesome/free-regular-svg-icons";
-import EventIcon from "../../images/event_icon_default.png";
 import ProfileIcon from "../../images/profile_icon_default.png";
+import EventIcon from "../../images/event_icon_default.png";
+import MapFrame from "../MapFrame";
+import EventPostCard from "./EventPostCard";
+import PostsTable from "../shared/PostsTable";
 
 const Event = () => {
   const { id } = useParams();
+  const { currentUser } = useContext(Context);
+  const navigate = useNavigate();
 
   const [event, setEvent] = useState();
   const [attendees, setAttendees] = useState([]);
+  const [posts, setPosts] = useState([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
   const [isAttending, setIsAttending] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
-  const navigate = useNavigate();
+  const [newPostText, setNewPostText] = useState("");
 
-  const { currentUser } = useContext(Context);
-
-  // do we need loading state to prevent double click?
-  const toggleAttendance = async () => {
-    if (isAttending) {
-      await EventsAPI.unattend(id); // Unattend the event
-      setIsAttending(false);
-    } else {
-      await EventsAPI.attend(id); // Attend the event
-      setIsAttending(true);
-    }
+  const getEvent = async () => {
+    const resEvent = await EventsAPI.get(id);
+    setIsAttending(resEvent.isAttending);
+    setIsSaved(resEvent.isSaved);
+    setEvent(resEvent);
   };
 
-  // do we need loading state to prevent double click?
-  const toggleSave = async () => {
-    if (isSaved) {
-      await EventsAPI.removeSave(id); // Unsave the event
-      setIsSaved(false);
-    } else {
-      await EventsAPI.makeSave(id); // Save the event
-      setIsSaved(true);
-    }
+  const getEventAttendees = async () => {
+    const resAttendees = await EventsAPI.getAttendees(id);
+    setAttendees(resAttendees);
   };
 
+  const getEventPosts = async () => {
+    const eventPosts = await EventsAPI.getPosts(id);
+    setPosts(eventPosts);
+  };
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        // promise.all?
-        const event = await EventsAPI.get(id);
-        const attendees = await EventsAPI.getAttendees(id);
-        setIsAttending(event.isAttending);
-        setIsSaved(event.isSaved);
-        setEvent(event);
-        setAttendees(attendees);
-        setIsLoading(false);
-      } catch (error) {
-        setError(error?.message);
-      }
+  const getData = async () => {
+    try {
+      // promise.all?
+      await getEvent();
+      await getEventAttendees();
+      await getEventPosts();
+      setIsLoading(false);
+    } catch (error) {
+      setError(error?.message);
     }
-    getData();
-  }, [id]);
-
-
+  };
 
   const handleDelete = async () => {
     try {
@@ -93,6 +88,54 @@ const Event = () => {
       setError("Failed to delete the event");
     }
   };
+
+  const handleCreatePost = async (e) => {
+    e.preventDefault();
+    try {
+      await EventsAPI.createPost(id, newPostText);
+      await getEventPosts();
+      setNewPostText("");
+    } catch (error) {
+      setError("Failed to create new post");
+    }
+  };
+
+  // do we need loading state to prevent double click?
+  const toggleAttendance = async () => {
+    try {
+      if (isAttending) {
+        await EventsAPI.unattend(id); // Unattend the event
+        setIsAttending(false);
+      } else {
+        await EventsAPI.attend(id); // Attend the event
+        setIsAttending(true);
+      }
+      await getEventAttendees();
+    } catch (error) {
+      setError(error?.message);
+    }
+  };
+
+
+  // do we need loading state to prevent double click?
+  const toggleSave = async () => {
+    try {
+      if (isSaved) {
+        await EventsAPI.removeSave(id); // Unsave the event
+        setIsSaved(false);
+      } else {
+        await EventsAPI.makeSave(id); // Save the event
+        setIsSaved(true);
+      }
+    } catch (error) {
+      setError(error?.message);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   if (error) {
     return (
@@ -122,20 +165,15 @@ const Event = () => {
         <Row>
           {/* Main Photo and Edit/Delete */}
           <Col md="4">
-            <Card
-              className="rounded-4 mb-4"
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                border: "none",
-              }}
-            >
+            <Card className="rounded-4 mb-4" style={{ border: "none" }}>
               <CardImg
                 top
                 src={event.pfpUrl || EventIcon}
                 alt="event-main-photo"
                 className="rounded-top-4"
+                style={{ height: "200px", objectFit: "contain" }}
               />
-              <CardBody className="text-center">
+              <CardBody>
                 <div className="icon-button-row">
                   {sameUser || isAdmin ? (
                     <>
@@ -213,99 +251,122 @@ const Event = () => {
           </Col>
           {/* Event Details */}
           <Col md="8">
-            <Card
-              className="rounded-4 mb-4"
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                border: "none",
-              }}
-            >
-              <CardBody>
-                <CardTitle tag="h2">{event.title}</CardTitle>
-                <CardSubtitle>
-                  Organized by:{" "}
-                  <Link to={`/users/${event.createdBy}`}>
-                    <b>
-                      <i>{`${event.firstName} ${event.lastName}`}</i>
-                    </b>
-                  </Link>
-                  <CardText>
-                    Status:{" "}
-                    <span
-                      style={{
-                        color: isPastEvent(event) ? "red" : "green",
-                      }}
-                    >
-                      {isPastEvent(event) ? "Past" : "Upcoming"}
-                    </span>
-                  </CardText>
-                </CardSubtitle>
-                <CardText
+            <div style={{ padding: "12px" }}>
+              <CardTitle tag="h2">{event.title}</CardTitle>
+              <CardSubtitle>
+                Organized by:{" "}
+                <Link to={`/users/${event.createdBy}`}>
+                  <b>
+                    <i>{`${event.firstName} ${event.lastName}`}</i>
+                  </b>
+                </Link>
+              </CardSubtitle>
+              <CardText style={{ marginTop: "20px" }}>
+                Status:{" "}
+                <span
                   style={{
-                    marginTop: "20px",
-                    marginBottom: "20px",
+                    color: isPastEvent(event) ? "red" : "green",
                   }}
                 >
-                  <Badge color="secondary" className="me-2">
-                    <h6>{formatData(event.date)}</h6>
-                  </Badge>
-                  <Badge color="dark" className="me-2">
-                    <h6>{event.location}</h6>
-                  </Badge>
-                </CardText>
-                <CardText className="text-muted">{event.description}</CardText>
-              </CardBody>
-            </Card>
+                  {isPastEvent(event) ? "Past" : "Upcoming"}
+                </span>
+              </CardText>
+              <CardText
+                style={{
+                  marginTop: "20px",
+                  marginBottom: "20px",
+                }}
+              >
+                <Badge color="secondary" className="me-2">
+                  <h6>{formatData(event.date)}</h6>
+                </Badge>
+                <Badge color="dark" className="me-2">
+                  <h6>{event.location}</h6>
+                </Badge>
+              </CardText>
+              <CardText className="text-muted" style={{ marginTop: "20px" }}>
+                {event.description}
+              </CardText>
+            </div>
           </Col>
         </Row>
         {/* Attendees Section */}
         <Row className="mt-4">
-          <Col>
-            <Card
-              className="rounded-4"
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                border: "none",
-                display: "flex",
-                alignItems: "start",
-              }}
-            >
-              <CardBody>
-                <CardTitle tag="h4">Attendees: {event.attendeesCount}</CardTitle>
-                <div className="d-flex flex-wrap">
-                  {attendees?.map((attendee) => {
-                    const attendeeId = `attendee-${attendee.userId}`;
-                    return (
-                      <div key={attendee.userId} className="me-2 mb-2">
-                        <Link to={`/users/${attendee.userId}`}>
-                          <img
-                            src={attendee.pfpUrl || ProfileIcon}
-                            alt="profile-photo"
-                            className="rounded-circle"
-                            id={`attendee-${attendeeId}`}
-                            style={{
-                              width: "50px",
-                              height: "50px",
-                              cursor: "pointer",
-                              border: "2px solid #ccc",
-                            }}
-                          />
-                        </Link>
-                        <UncontrolledTooltip
-                          placement="top"
-                          target={`attendee-${attendeeId}`}
-                        >
-                          {attendee.firstName} {attendee.lastName}
-                        </UncontrolledTooltip>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardBody>
-            </Card>
+          <Col md="4">
+            <div style={{ padding: "12px" }}>
+              <CardTitle tag="h4" style={{ marginBottom: "8px" }}>
+                Attendees: {attendees?.length}
+              </CardTitle>
+              <div className="d-flex flex-wrap">
+                {attendees?.map((attendee) => {
+                  const attendeeId = `attendee-${attendee.userId}`;
+                  return (
+                    <div key={attendee.userId} className="me-2 mb-2">
+                      <Link to={`/users/${attendee.userId}`}>
+                        <img
+                          src={attendee.pfpUrl || ProfileIcon}
+                          alt="profile-photo"
+                          className="rounded-circle"
+                          id={`attendee-${attendeeId}`}
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            cursor: "pointer",
+                            border: "2px solid #ccc",
+                          }}
+                        />
+                      </Link>
+                      <UncontrolledTooltip
+                        placement="top"
+                        target={`attendee-${attendeeId}`}
+                      >
+                        {attendee.firstName} {attendee.lastName}
+                      </UncontrolledTooltip>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            {/* Maps Section */}
+            <Row className="mt-4">
+              <MapFrame location={event.location} />
+            </Row>
+          </Col>
+          {/* Event Posts Section */}
+          <Col md="8">
+            <div style={{ padding: "12px" }}>
+              <CardTitle tag="h4" style={{ marginBottom: "8px" }}>
+                Feed
+              </CardTitle>
+              <Form onSubmit={handleCreatePost}>
+                <FormGroup>
+                  <Label for="newpost">New Post</Label>
+                  <div style={{ display: "flex", gap: "12px" }}>
+                    <Input
+                      id="newpost"
+                      name="text"
+                      type="textarea"
+                      value={newPostText}
+                      style={{ width: "500px", border: "1px solid #ccc" }}
+                      onChange={(e) => setNewPostText(e.target.value)}
+                    />
+                    <div>
+                      <Button
+                        color="warning"
+                        className="yellow-button"
+                        disabled={!newPostText?.trim()}
+                      >
+                        Submit
+                      </Button>
+                    </div>
+                  </div>
+                </FormGroup>
+              </Form>
+              <PostsTable posts={posts} getPosts={getEventPosts} CardComponent={EventPostCard} />
+            </div>
           </Col>
         </Row>
-      </Container>
+      </Container >
     </>
   );
 };

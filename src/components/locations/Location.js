@@ -4,6 +4,7 @@ import LocationsAPI from "../../api/LocationsAPI";
 import Loader from "../Loader";
 import Context from "../Context";
 import {
+  Badge,
   Card,
   CardBody,
   CardImg,
@@ -23,44 +24,46 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faBookmark as faRegularBookmark } from "@fortawesome/free-regular-svg-icons";
 import LocationIcon from "../../images/location_icon_default.png";
+import MapFrame from "../MapFrame";
+import LocationReviewsTable from "./reviews/LocationReviewsTable";
+import LocationReviewForm from "./reviews/LocationReviewForm";
 
 const Location = () => {
   const { id } = useParams();
+  const { currentUser } = useContext(Context);
+  const navigate = useNavigate();
 
   const [location, setLocation] = useState();
+  const [reviews, setReviews] = useState();
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
   const [isSaved, setIsSaved] = useState(false);
-  const navigate = useNavigate();
 
-  const { currentUser } = useContext(Context);
+  const [newReviewText, setNewReviewText] = useState("");
+  const [newReviewRate, setNewReviewRate] = useState(0);
 
-  // do we need loading state to prevent double click?
-  const toggleSave = async () => {
-    if (isSaved) {
-      await LocationsAPI.removeSave(id); // Unsave the location
-      setIsSaved(false);
-    } else {
-      await LocationsAPI.makeSave(id); // Save the location
-      setIsSaved(true);
-    }
+  const getLocation = async () => {
+    const resLocation = await LocationsAPI.get(id);
+    setIsSaved(resLocation.isSaved);
+    setLocation(resLocation);
   };
 
+  const getLocationReviews = async () => {
+    const locationReviews = await LocationsAPI.getReviews(id);
+    setReviews(locationReviews);
+  };
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        const location = await LocationsAPI.get(id);
-        setIsSaved(location.isSaved);
-        setLocation(location);
-        setIsLoading(false);
-      } catch (error) {
-        setError(error?.message);
-      }
+  const getData = async () => {
+    try {
+      // promise.all?
+      await getLocation();
+      await getLocationReviews();
+      setIsLoading(false);
+    } catch (error) {
+      setError(error?.message);
     }
-    getData();
-  }, [id]);
-
+  };
   const handleDelete = async () => {
     try {
       await LocationsAPI.delete(id);
@@ -69,6 +72,38 @@ const Location = () => {
       setError("Failed to delete the location");
     }
   };
+
+  const handleCreateReview = async (e) => {
+    e.preventDefault();
+    try {
+      await LocationsAPI.createReview(id, newReviewText, newReviewRate);
+      await getLocationReviews();
+      setNewReviewText("");   
+      setNewReviewRate(0);
+    } catch (error) {
+      setError("Failed to create new review");
+    }
+  };
+
+  // do we need loading state to prevent double click?
+  const toggleSave = async () => {
+    try {
+      if (isSaved) {
+        await LocationsAPI.removeSave(id); // Unsave the location
+        setIsSaved(false);
+      } else {
+        await LocationsAPI.makeSave(id); // Save the location
+        setIsSaved(true);
+      }
+    } catch (error) {
+      setError(error?.message);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   if (error) {
     return (
@@ -97,20 +132,15 @@ const Location = () => {
         <Row>
           {/* Main Photo and Edit/Delete*/}
           <Col md="4">
-            <Card
-              className="rounded-4 mb-4"
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                border: "none",
-              }}
-            >
+            <Card className="rounded-4 mb-4" style={{ border: "none" }}>
               <CardImg
                 top
                 src={location.pfpUrl || LocationIcon}
                 alt="location-main-photo"
                 className="rounded-top-4"
+                style={{ height: "200px", objectFit: "contain" }}
               />
-              <CardBody className="text-center">
+              <CardBody>
                 <div className="icon-button-row">
                   {isAdmin ? (
                     <>
@@ -127,10 +157,7 @@ const Location = () => {
                           icon={faPenToSquare}
                           className="fa-xl"
                         />
-                        <UncontrolledTooltip
-                          placement="top"
-                          target="editIcon"
-                        >
+                        <UncontrolledTooltip placement="top" target="editIcon">
                           Edit
                         </UncontrolledTooltip>
                       </div>
@@ -165,10 +192,7 @@ const Location = () => {
                       className="fa-xl"
                     />
                   </div>
-                  <UncontrolledTooltip
-                    placement="top"
-                    target="saveIcon"
-                  >
+                  <UncontrolledTooltip placement="top" target="saveIcon">
                     {isSaved ? "Unsave" : "Save"}
                   </UncontrolledTooltip>
                 </div>
@@ -177,28 +201,53 @@ const Location = () => {
           </Col>
           {/* Location Details */}
           <Col md="8">
-            <Card
-              className="rounded-4 mb-4"
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                border: "none",
-              }}
-            >
-              <CardBody>
-                <CardTitle tag="h2">{location.name}</CardTitle>
-                <CardSubtitle>
-                  Created by:{" "}
-                  <Link to={`/users/${location.createdBy}`}>
-                    <b>
-                      <i>{`${location.firstName} ${location.lastName}`}</i>
-                    </b>
-                  </Link>
-                </CardSubtitle>
-                <CardText className="text-muted" style={{ marginTop: "20px" }}>
-                  {location.description}
-                </CardText>
-              </CardBody>
-            </Card>
+            <div style={{ padding: "12px" }}>
+              <CardTitle tag="h2">{location.name}</CardTitle>
+              <CardSubtitle>
+                Created by:{" "}
+                <Link to={`/users/${location.createdBy}`}>
+                  <b>
+                    <i>{`${location.firstName} ${location.lastName}`}</i>
+                  </b>
+                </Link>
+              </CardSubtitle>
+              <CardText
+                style={{
+                  marginTop: "20px",
+                  marginBottom: "20px",
+                }}
+              >
+                <Badge color="dark" className="me-2">
+                  <h6>{location.address}</h6>
+                </Badge>
+              </CardText>
+              <CardText className="text-muted" style={{ marginTop: "20px" }}>
+                {location.description}
+              </CardText>
+            </div>
+          </Col>
+        </Row>
+        {/* Maps Section */}
+        <Row className="mt-4">
+          <MapFrame location={location.address} />
+          {/* Location Reviews Section */}
+          <Col md="8">
+            <div style={{ padding: "12px" }}>
+              <CardTitle tag="h4" style={{ marginBottom: "8px" }}>
+                Feed
+              </CardTitle>
+              <LocationReviewForm
+                newReviewText={newReviewText}
+                newReviewRate={newReviewRate}
+                setNewReviewText={setNewReviewText}
+                setNewReviewRate={setNewReviewRate}
+                handleCreateReview={handleCreateReview}
+              />
+              <LocationReviewsTable
+                locationReviews={reviews}
+                getReviews={getLocationReviews}
+              />
+            </div>
           </Col>
         </Row>
       </Container>

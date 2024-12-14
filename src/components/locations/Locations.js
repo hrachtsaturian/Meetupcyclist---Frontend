@@ -5,7 +5,7 @@ import SearchBar from "../SearchBar";
 import Context from "../Context";
 import Loader from "../Loader";
 import { Link } from "react-router-dom";
-import { Button, Col } from "reactstrap";
+import { Button } from "reactstrap";
 
 const Locations = () => {
   const { currentUser } = useContext(Context);
@@ -54,7 +54,7 @@ const Locations = () => {
         <div
           style={{
             display: "flex",
-            gap: "40px",
+            gap: "20px",
             justifyContent: "space-between",
           }}
         >
@@ -66,12 +66,11 @@ const Locations = () => {
           />
           {currentUser.isAdmin ? (
             <Link to="/locations/new">
-              <Col>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 <Button color="warning" className="yellow-button">
                   Create Location
                 </Button>
-              </Col>
-              <i>*Only Admins permitted</i>
+              </div>
             </Link>
           ) : null}
         </div>

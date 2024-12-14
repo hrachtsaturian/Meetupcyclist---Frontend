@@ -53,7 +53,7 @@ const AttendingEvents = () => {
         My Events
       </h3>
       <hr></hr>
-      <div style={{ marginBottom: "12px" }}>
+      <div style={{ marginBottom: "12px", textAlign: "center" }}>
         <ButtonGroup>
           <Button
             onClick={() => setSelectedFilter("upcoming")}

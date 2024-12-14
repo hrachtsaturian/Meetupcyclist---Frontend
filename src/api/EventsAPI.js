@@ -54,11 +54,46 @@ class EventsAPI extends BaseAPI {
     });
   }
 
-    // get event attendees // GET events/:id/attendees
-    static async getAttendees(id) {
-      const res = await this.request({ path: `events/${id}/attendees` });
-      return res.data;
-    }
+  // get event attendees // GET events/:id/attendees
+  static async getAttendees(id) {
+    const res = await this.request({ path: `events/${id}/attendees` });
+    return res.data;
+  }
+
+  // get event posts // GET events/:id/posts
+  static async getPosts(id) {
+    const res = await this.request({ path: `events/${id}/posts` });
+    return res.data;
+  }
+
+  // add event post // POST events/:id/posts
+  static async createPost(id, newPostText) {
+    const res = await this.request({
+      path: `events/${id}/posts`,
+      method: "post",
+      data: { text: newPostText }
+    });
+    return res.data;
+  }
+
+  // edit event post // PATCH eventposts/:id
+  static async editPost(id, newPostText) {
+    const res = await this.request({
+      path: `eventposts/${id}`,
+      method: "patch",
+      data: { text: newPostText }
+    });
+    return res.data;
+  }
+
+  // delete event post // DELETE eventposts/:id
+  static async deletePost(id) {
+    const res = await this.request({
+      path: `eventposts/${id}`,
+      method: "delete",
+    });
+    return res.data;
+  }
 
   // attend // POST events/:id/attendance
   static async attend(eventId) {
@@ -72,22 +107,6 @@ class EventsAPI extends BaseAPI {
   static async unattend(eventId) {
     await this.request({
       path: `events/${eventId}/attendance`,
-      method: "delete",
-    });
-  }
-
-  // attach // POST events/:id/groups/:id
-  static async attach(eventId, groupId) {
-    await this.request({
-      path: `events/${eventId}/groups/${groupId}`,
-      method: "post",
-    });
-  }
-
-  // remove // DELETE events/:id/groups/:id
-  static async remove(eventId, groupId) {
-    await this.request({
-      path: `events/${eventId}/groups/${groupId}`,
       method: "delete",
     });
   }
