@@ -85,12 +85,10 @@ const GroupNew = () => {
             onChange={handleUploadImage}
           />
         </Col>
-        <div style={{ paddingTop: "20px" }}>
-          <Col>
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
             <Button color="warning" className="yellow-button">
               Submit
             </Button>
-          </Col>
         </div>
       </FormGroup>
       {error && (

@@ -62,7 +62,7 @@ const LocationReviewCard = ({ locationReview, getReviews }) => {
                 name="text"
                 type="textarea"
                 value={reviewText}
-                style={{ border: "1px solid #ccc" }}
+                style={{ border: "1px solid #ccc", marginBottom: "10px" }}
                 onChange={(e) => setReviewText(e.target.value)}
               />
               <LocationReviewRating
@@ -92,9 +92,8 @@ const LocationReviewCard = ({ locationReview, getReviews }) => {
       ? `${userFullName} (Admin)`
       : userFullName;
   const displayText = isEditing ? showInput() : locationReview.text;
-  const displayDate = `${formatData(locationReview.createdAt)}${
-    locationReview.updatedAt ? " (edited)" : ""
-  }`;
+  const displayDate = `${formatData(locationReview.createdAt)}${locationReview.updatedAt ? " (edited)" : ""
+    }`;
 
   return (
     <Card className="my-2">
@@ -127,9 +126,13 @@ const LocationReviewCard = ({ locationReview, getReviews }) => {
         <CardBody style={{ position: "relative", textAlign: "left" }}>
           <CardTitle className="fs-6">{displayName}</CardTitle>
           <hr></hr>
-          <CardTitle className="fs-5" style={{ wordBreak: "break-word" }}>{displayText}</CardTitle>
+          <CardTitle className="fs-5" style={{ wordBreak: "break-word" }}>
+            {displayText}
+          </CardTitle>
           {!isEditing && <hr></hr>}
-          {!isEditing && <LocationReviewRating rating={locationReview.rate} isMuted={true} />}
+          {!isEditing && (
+            <LocationReviewRating rating={locationReview.rate} isMuted={true} />
+          )}
           <hr></hr>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <CardText className="fs-6 text-muted">{displayDate}</CardText>
@@ -156,24 +159,24 @@ const LocationReviewCard = ({ locationReview, getReviews }) => {
               {/* either createdBy or isAdmin can delete */}
               {(currentUser.id === locationReview.userId ||
                 currentUser.isAdmin) && (
-                <div
-                  id={`deleteReviewIcon-${locationReview.id}`}
-                  className="icon-wrapper"
-                  style={{
-                    cursor: "pointer",
-                    display: "inline-block",
-                  }}
-                  onClick={handleDelete}
-                >
-                  <FontAwesomeIcon icon={faTrash} className="fa-xl" />
-                  <UncontrolledTooltip
-                    placement="top"
-                    target={`deleteReviewIcon-${locationReview.id}`}
+                  <div
+                    id={`deleteReviewIcon-${locationReview.id}`}
+                    className="icon-wrapper"
+                    style={{
+                      cursor: "pointer",
+                      display: "inline-block",
+                    }}
+                    onClick={handleDelete}
                   >
-                    Delete
-                  </UncontrolledTooltip>
-                </div>
-              )}
+                    <FontAwesomeIcon icon={faTrash} className="fa-xl" />
+                    <UncontrolledTooltip
+                      placement="top"
+                      target={`deleteReviewIcon-${locationReview.id}`}
+                    >
+                      Delete
+                    </UncontrolledTooltip>
+                  </div>
+                )}
             </div>
           </div>
         </CardBody>

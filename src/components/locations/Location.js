@@ -78,7 +78,7 @@ const Location = () => {
     try {
       await LocationsAPI.createReview(id, newReviewText, newReviewRate);
       await getLocationReviews();
-      setNewReviewText("");   
+      setNewReviewText("");
       setNewReviewRate(0);
     } catch (error) {
       setError("Failed to create new review");
@@ -211,6 +211,11 @@ const Location = () => {
                   </b>
                 </Link>
               </CardSubtitle>
+                <br></br>
+                <CardSubtitle>
+                  Average Rating: {location.avgRating} / 5
+                </CardSubtitle>
+                <br></br>
               <CardText
                 style={{
                   marginTop: "20px",
@@ -234,7 +239,7 @@ const Location = () => {
           <Col md="8">
             <div style={{ padding: "12px" }}>
               <CardTitle tag="h4" style={{ marginBottom: "8px" }}>
-                Feed
+                Reviews
               </CardTitle>
               <LocationReviewForm
                 newReviewText={newReviewText}

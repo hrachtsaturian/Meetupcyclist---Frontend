@@ -6,7 +6,6 @@ import {
   CardBody,
   CardSubtitle,
   CardTitle,
-  Col,
   UncontrolledTooltip,
 } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -49,7 +48,7 @@ const SaveGroupCard = ({ group, getSaves, setLoading }) => {
         <CardSubtitle>
           Founder: {group.firstName} {group.lastName}
         </CardSubtitle>
-        <Col style={{ paddingTop: "10px" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
           <div
             id={`unsaveIcon-${group.id}`}
             style={{
@@ -66,7 +65,7 @@ const SaveGroupCard = ({ group, getSaves, setLoading }) => {
               Unsave
             </UncontrolledTooltip>
           </div>
-        </Col>
+        </div>
       </CardBody>
     </Card>
   );
