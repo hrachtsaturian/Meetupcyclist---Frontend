@@ -36,6 +36,14 @@ class UsersAPI extends BaseAPI {
     });
     return res.data;
   }
+
+  static async deactivate(id) {
+    const res = await this.request({
+      path: `users/${id}/deactivate`,
+      method: "patch",
+    });
+    return res.data;
+  }
 }
 
 export default UsersAPI;

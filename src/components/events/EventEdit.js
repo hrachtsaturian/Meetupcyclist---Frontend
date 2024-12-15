@@ -20,7 +20,7 @@ const EventEdit = () => {
 
   // first, find the event data
   useEffect(() => {
-    async function getData() {
+    const getData = async () => {
       try {
         const { title, description, date, location, pfpUrl, createdBy } =
           await EventsAPI.get(id);

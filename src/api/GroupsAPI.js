@@ -1,3 +1,4 @@
+import qs from "qs";
 import BaseAPI from "./BaseAPI";
 
 /**
@@ -5,6 +6,7 @@ import BaseAPI from "./BaseAPI";
  *
  */
 class GroupsAPI extends BaseAPI {
+
   static async create(data) {
     const res = await this.request({
       path: `groups`,
@@ -19,8 +21,16 @@ class GroupsAPI extends BaseAPI {
     return res.data;
   }
 
-  static async getAll({ isJoined = false, isSaved = false } = {}) {
-    const query = new URLSearchParams({ isJoined, isSaved });
+  static async getAll({
+    isJoined = null,
+    isSaved = null,
+    createdBy = null,
+  } = {}) {
+    const query = qs.stringify({
+      isSaved,
+      isJoined,
+      createdBy,
+    });
     const res = await this.request({ path: `groups?${query.toString()}` });
     return res.data;
   }
@@ -64,7 +74,15 @@ class GroupsAPI extends BaseAPI {
     const res = await this.request({
       path: `groups/${id}/posts`,
       method: "post",
-      data: { text: newPostText }
+      data: { text: newPostText },
+    });
+    return res.data;
+  }
+
+  static async getRecentPosts() {
+    const res = await this.request({
+      path: `groupposts/recent`,
+      method: "get",
     });
     return res.data;
   }
@@ -74,7 +92,7 @@ class GroupsAPI extends BaseAPI {
     const res = await this.request({
       path: `groupposts/${id}`,
       method: "patch",
-      data: { text: newPostText }
+      data: { text: newPostText },
     });
     return res.data;
   }

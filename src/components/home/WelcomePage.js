@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "reactstrap";
 import { Link } from "react-router-dom";
-import LogoBig from "../images/logo_big.png";
+import LogoBig from "../../images/logo_big.png";
 
 const WelcomePage = () => {
   return (

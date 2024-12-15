@@ -22,8 +22,8 @@ class EventsAPI extends BaseAPI {
 
   static async getAll({
     filter: {
-      isSaved = false,
-      isAttending = false,
+      isSaved = null,
+      isAttending = null,
       minDate = null,
       maxDate = null,
       createdBy = null

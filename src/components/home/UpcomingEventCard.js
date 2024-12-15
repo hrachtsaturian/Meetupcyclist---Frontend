@@ -12,18 +12,18 @@ import {
 import { formatDate, isPastEvent } from "../../helpers/helpers";
 import EventIcon from "../../images/event_icon_default.png";
 
-const AttendingEventCard = ({
-  attendingEvent,
-  getAttendingEvents,
-  setLoading,
+const UpcomingEventCard = ({
+  event,
+  getEvents,
+  setIsLoading,
 }) => {
   const handleUnattend = async (e) => {
     e.preventDefault(); // Prevent navigation due to card link
-    setLoading(true);
+    setIsLoading(true);
     try {
-      await EventsAPI.unattend(attendingEvent.id);
-      await getAttendingEvents();
-      setLoading(false);
+      await EventsAPI.unattend(event.id);
+      await getEvents();
+      setIsLoading(false);
     } catch (error) {
       console.error("Error unattending the event:", error);
     }
@@ -35,12 +35,12 @@ const AttendingEventCard = ({
         width: "18rem",
       }}
       tag={Link}
-      to={`/events/${attendingEvent.id}`}
+      to={`/events/${event.id}`}
     >
       <div style={{ justifyContent: "center", display: "flex" }}>
         <img
           alt="event-main-photo"
-          src={attendingEvent.pfpUrl || EventIcon
+          src={event.pfpUrl || EventIcon
           }
           style={{
             width: '200px',
@@ -53,16 +53,16 @@ const AttendingEventCard = ({
         <CardText>
           <b>
             <medium className="text-muted">
-              {formatDate(attendingEvent.date)}
+              {formatDate(event.date)}
             </medium>
           </b>
         </CardText>
-        <CardTitle className="fs-4">{attendingEvent.title}</CardTitle>
+        <CardTitle className="fs-4">{event.title}</CardTitle>
         <CardSubtitle>
-          Organizer: {attendingEvent.firstName} {attendingEvent.lastName}
+          Organizer: {event.firstName} {event.lastName}
         </CardSubtitle>
         <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
-          {!isPastEvent(attendingEvent) && (
+          {!isPastEvent(event) && (
             <Button
               color="warning"
               className="yellow-button"
@@ -77,4 +77,4 @@ const AttendingEventCard = ({
   );
 };
 
-export default AttendingEventCard;
+export default UpcomingEventCard;

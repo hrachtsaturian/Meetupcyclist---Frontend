@@ -4,7 +4,7 @@ import GroupsTable from "./GroupsTable";
 import SearchBar from "../SearchBar";
 import Loader from "../Loader";
 import { Link } from "react-router-dom";
-import { Button, Col } from "reactstrap";
+import { Button } from "reactstrap";
 
 const Groups = () => {
   const [groups, setGroups] = useState([]);
@@ -12,7 +12,7 @@ const Groups = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
 
-  async function getGroups() {
+  const getGroups = async () => {
     try {
       const res = await GroupsAPI.getAll();
       setGroups(res);

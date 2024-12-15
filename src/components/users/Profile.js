@@ -3,34 +3,91 @@ import { useNavigate, useParams } from "react-router-dom";
 import UsersAPI from "../../api/UsersAPI";
 import Context from "../Context";
 import Loader from "../Loader";
-import { Col, Row, UncontrolledTooltip } from "reactstrap";
+import { Button, Col, Row, UncontrolledTooltip } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
-import { formatDataMY } from "../../helpers/helpers";
+import { formatDateMY } from "../../helpers/helpers";
 import ProfileIcon from "../../images/profile_icon_default.png";
 
 import "../../styles/Profile.css";
+import EventsAPI from "../../api/EventsAPI";
+import GroupsAPI from "../../api/GroupsAPI";
+import UserGroupCard from "./UserGroupCard";
+import UserEventCard from "./UserEventCard";
 
 const Profile = () => {
   const { id } = useParams();
   const { currentUser } = useContext(Context);
-  const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState();
+  const [groups, setGroups] = useState(true);
+  const [events, setEvents] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        const res = await UsersAPI.get(id);
-        setUser(res);
-        setIsLoading(false);
-      } catch (error) {
-        setError(error?.message);
-      }
+  const getUser = async () => {
+    try {
+      const res = await UsersAPI.get(id);
+      setUser(res);
+    } catch (error) {
+      setError(error?.message);
     }
-    getData();
+  };
+
+  const getUserEvents = async () => {
+    try {
+      const res = await EventsAPI.getAll({
+        filter: { createdBy: id, minDate: new Date() },
+      });
+      setEvents(res);
+    } catch (error) {
+      setError(error?.message);
+    }
+  };
+
+  const getUserGroups = async () => {
+    try {
+      const res = await GroupsAPI.getAll({
+        createdBy: id,
+      });
+      setGroups(res);
+    } catch (error) {
+      setError(error?.message);
+    }
+  };
+
+  const getData = async () => {
+    try {
+      await Promise.all([getUser(), getUserEvents(), getUserGroups()]);
+      setIsLoading(false);
+    } catch (error) {
+      setError(error[0]?.message || "Failed to get user");
+    }
+  };
+
+  const handleDeactivate = async () => {
+    try {
+      const user = await UsersAPI.deactivate(id);
+      setUser(user);
+    } catch (error) {
+      setError(error?.message);
+    }
+  };
+
+  useEffect(() => {
+    getData(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  function showAlertOnDeactivate() {
+    if (
+      window.confirm(
+        "Are you sure you want to deactivate this user? This action not reversible."
+      )
+    ) {
+      handleDeactivate();
+    }
+  }
 
   if (error) {
     return (
@@ -61,17 +118,13 @@ const Profile = () => {
             <Col md="4" className="profile-sidebar">
               <div className="profile-header">
                 <div className="profile-photo">
-                  <img
-                    src={user.pfpUrl || ProfileIcon}
-                    alt="profile-photo"
-                  />
+                  <img src={user.pfpUrl || ProfileIcon} alt="profile-photo" />
                 </div>
                 <h4 className="profile-name">{`${user.firstName} ${user.lastName}`}</h4>
                 <p className="profile-date">
-                  Member since: {formatDataMY(user.createdAt)}
+                  Member since: {formatDateMY(user.createdAt)}
                 </p>
-                {/* is this correct? */}
-                {(sameUser || isAdmin) && (
+                {sameUser && (
                   <div>
                     <div
                       id="editIcon"
@@ -80,17 +133,33 @@ const Profile = () => {
                         display: "inline-block",
                         marginTop: "10px",
                       }}
-                      onClick={() => navigate(`/users/${id}/edit`)}
+                      onClick={() => navigate(`/profile/edit`)}
                     >
                       <FontAwesomeIcon icon={faPenToSquare} size="2x" />
-                      <UncontrolledTooltip
-                        placement="top"
-                        target="editIcon"
-                      >
+                      <UncontrolledTooltip placement="top" target="editIcon">
                         Edit
                       </UncontrolledTooltip>
                     </div>
                   </div>
+                )}
+                {isAdmin && !sameUser && !user.isAdmin && (
+                  <div>
+                    <Button
+                      color="danger"
+                      className="yellow-button"
+                      disabled={user.deactivatedAt}
+                      onClick={() => {
+                        showAlertOnDeactivate();
+                      }}
+                    >
+                      {user.deactivatedAt ? "Deactivated" : "Deactivate"}
+                    </Button>
+                  </div>
+                )}
+                {!isAdmin && user.deactivatedAt && (
+                  <p>
+                    <i>Account Deactivated</i>
+                  </p>
                 )}
               </div>
             </Col>
@@ -102,31 +171,31 @@ const Profile = () => {
               <hr></hr>
               <div className="groups-section">
                 <h5>Founded Groups:</h5>
-                {/* {user.groups && user.groups.length > 0 ? (
-                <ul>
-                  {user.groups.map((group) => (
-                    <li key={group.id}>
-                      <strong>{group.name}</strong>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No groups founded yet.</p>
-              )} */}
+                {groups && groups.length > 0 ? (
+                  <div>
+                    {groups.map((group) => (
+                      <div key={group.id} style={{ marginBottom: "10px" }}>
+                        <UserGroupCard group={group} />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No groups founded yet.</p>
+                )}
               </div>
               <div className="events-section">
                 <h5>Organizing Events:</h5>
-                {/* {user.events && user.events.length > 0 ? (
-                <ul>
-                  {user.events.map((event) => (
-                    <li key={event.id}>
-                      <strong>{event.name}</strong> - {formatData(event.date)}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No events organized yet.</p>
-              )} */}
+                {events && events.length > 0 ? (
+                  <div>
+                    {events.map((event) => (
+                      <div key={event.id} style={{ marginBottom: "10px" }}>
+                        <UserEventCard event={event} />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No events organized yet.</p>
+                )}
               </div>
             </Col>
           </Row>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import WelcomePage from "./components/WelcomePage";
-import HomePage from "./components/HomePage";
+import WelcomePage from "./components/home/WelcomePage";
+import HomePage from "./components/home/HomePage";
 import NavBar from "./components/NavBar";
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
@@ -96,7 +96,7 @@ const App = () => {
                   element={<ProtectedRoute element={<Profile />} />}
                 />
                 <Route
-                  path="/users/:id/edit"
+                  path="/profile/edit"
                   element={<ProtectedRoute element={<ProfileEdit />} />}
                 />
                 <Route

@@ -12,7 +12,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark as faSolidBookmark } from "@fortawesome/free-solid-svg-icons";
 import { faBookmark as faRegularBookmark } from "@fortawesome/free-regular-svg-icons";
-import { formatData } from "../../helpers/helpers";
+import { formatDate } from "../../helpers/helpers";
 import EventIcon from "../../images/event_icon_default.png";
 
 const EventRow = ({ event }) => {
@@ -32,8 +32,8 @@ const EventRow = ({ event }) => {
 
 
   return (
-    <Card className="my-2" tag={Link} to={`/events/${event.id}`} >
-      <div style={{ display: 'flex', width: '700px' }}>
+    <Card className="my-2" tag={Link} to={`/events/${event.id}`} style={{ width: '700px' }}>
+      <div style={{ display: 'flex' }}>
         <CardImg
           alt="event-main-photo"
           src={event.pfpUrl || EventIcon
@@ -53,7 +53,7 @@ const EventRow = ({ event }) => {
           </CardSubtitle>
           <hr></hr>
           <CardTitle className="fs-5">
-            {formatData(event.date)}
+            {formatDate(event.date)}
           </CardTitle>
           <CardSubtitle>
             Attendees: {event.attendeesCount}

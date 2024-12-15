@@ -45,7 +45,7 @@ const EventNew = () => {
   };
 
   useEffect(() => {
-    async function getGroup() {
+    const getGroup = async () => {
       try {
         const group = await GroupsAPI.get(groupId);
         setGroupToLink(group);

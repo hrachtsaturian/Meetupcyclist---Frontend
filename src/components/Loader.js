@@ -1,23 +1,14 @@
 import React from "react";
-import { Card, CardBody } from "reactstrap";
+import { Spinner } from "reactstrap";
 
 const Loader = () => {
   return (
-    <main>
-      <Card>
-        <CardBody>
-          <div className="meetupcyclist"
-            style={{
-              fontSize: "40px",
-              color: "black"
-            }}
-          >
-            Loading &hellip;
-          </div>
-        </CardBody>
-      </Card>
-    </main>
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <Spinner color="warning" style={{ width: "3rem", height: "3rem" }}>
+        Loading...
+      </Spinner>
+    </div>
   );
-}
+};
 
 export default Loader;

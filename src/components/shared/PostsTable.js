@@ -10,7 +10,7 @@ const PostsTable = ({ posts, getPosts, CardComponent }) => {
             }}
         >
             {posts.length === 0 ? (
-                <p>Feed is empty at this moment.</p>
+                <p>Feed is empty at this moment</p>
             ) : (
                 <>
                     {posts.map((post) => (

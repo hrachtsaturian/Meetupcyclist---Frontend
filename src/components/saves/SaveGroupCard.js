@@ -2,14 +2,12 @@ import React  from "react";
 import GroupsAPI from "../../api/GroupsAPI";
 import { Link } from "react-router-dom";
 import {
+  Button,
   Card,
   CardBody,
   CardSubtitle,
   CardTitle,
-  UncontrolledTooltip,
 } from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookmark } from "@fortawesome/free-solid-svg-icons";
 import GroupIcon from "../../images/group_icon_default.png";
 
 const SaveGroupCard = ({ group, getSaves, setLoading }) => {
@@ -49,22 +47,15 @@ const SaveGroupCard = ({ group, getSaves, setLoading }) => {
           Founder: {group.firstName} {group.lastName}
         </CardSubtitle>
         <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
-          <div
-            id={`unsaveIcon-${group.id}`}
-            style={{
-              cursor: "pointer",
-              display: "inline-block",
-            }}
-            onClick={handleUnsave}
-          >
-            <FontAwesomeIcon icon={faBookmark} className="fa-xl" />
-            <UncontrolledTooltip
-              placement="top"
-              target={`unsaveIcon-${group.id}`}
+          {(
+            <Button
+              color="warning"
+              className="yellow-button"
+              onClick={handleUnsave}
             >
               Unsave
-            </UncontrolledTooltip>
-          </div>
+            </Button>
+          )}
         </div>
       </CardBody>
     </Card>

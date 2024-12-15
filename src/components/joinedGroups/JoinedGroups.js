@@ -7,7 +7,7 @@ const JoinedGroups = () => {
   const [joinedGroups, setJoinedGroups] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  async function getJoinedGroups() {
+  const getJoinedGroups = async () => {
     try {
       const groups = await GroupsAPI.getAll({ isJoined: true });
       setJoinedGroups(groups);
@@ -15,7 +15,7 @@ const JoinedGroups = () => {
     } catch (err) {
       console.error("Error fetching joined groups:", err);
     }
-  }
+  };
 
   useEffect(() => {
     getJoinedGroups();
@@ -27,7 +27,12 @@ const JoinedGroups = () => {
 
   return (
     <>
-      <h3 style={{fontSize: "40px" }}className="text-center mb-2 meetupcyclist">My Groups</h3>
+      <h3
+        style={{ fontSize: "40px" }}
+        className="text-center mb-2 meetupcyclist"
+      >
+        My Groups
+      </h3>
       <hr></hr>
       <JoinedGroupsTable
         joinedGroups={joinedGroups}

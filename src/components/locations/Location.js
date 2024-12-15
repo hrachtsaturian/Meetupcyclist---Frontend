@@ -56,12 +56,10 @@ const Location = () => {
 
   const getData = async () => {
     try {
-      // promise.all?
-      await getLocation();
-      await getLocationReviews();
+      await Promise.all([getLocation(), getLocationReviews()]);
       setIsLoading(false);
     } catch (error) {
-      setError(error?.message);
+      setError(error[0]?.message || "Failed to get location");
     }
   };
   const handleDelete = async () => {
