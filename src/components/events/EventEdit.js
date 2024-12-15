@@ -169,12 +169,10 @@ const EventEdit = () => {
             timeIntervals={15}
           />
         </Col>
-        <div style={{ paddingTop: "20px" }}>
-          <Col>
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
             <Button color="warning" className="yellow-button">
               Save changes
             </Button>
-          </Col>
         </div>
       </FormGroup>
       {isSuccess && (

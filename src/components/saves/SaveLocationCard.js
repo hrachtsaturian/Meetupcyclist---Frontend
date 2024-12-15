@@ -6,7 +6,6 @@ import {
   CardBody,
   CardSubtitle,
   CardTitle,
-  Col,
   UncontrolledTooltip,
 } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -49,7 +48,7 @@ const SaveLocationCard = ({ location, getSaves, setLoading }) => {
         <CardSubtitle>
           Created by: {location.firstName} {location.lastName}
         </CardSubtitle>
-        <Col style={{ paddingTop: "10px" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
           <div
             id={`unsaveIcon-${location.id}`}
             style={{
@@ -66,7 +65,7 @@ const SaveLocationCard = ({ location, getSaves, setLoading }) => {
               Unsave
             </UncontrolledTooltip>
           </div>
-        </Col>
+        </div>
       </CardBody>
     </Card>
   );

@@ -20,7 +20,11 @@ const LocationReviewForm = ({
               name="text"
               type="textarea"
               value={newReviewText}
-              style={{ width: "500px", border: "1px solid #ccc" }}
+              style={{
+                width: "500px",
+                border: "1px solid #ccc",
+                marginBottom: "10px",
+              }}
               onChange={(e) => setNewReviewText(e.target.value)}
             />
             <LocationReviewRating
