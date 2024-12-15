@@ -7,7 +7,6 @@ import {
   CardBody,
   CardSubtitle,
   CardTitle,
-  Col,
 } from "reactstrap";
 import GroupIcon from "../../images/group_icon_default.png";
 import Context from "../Context";

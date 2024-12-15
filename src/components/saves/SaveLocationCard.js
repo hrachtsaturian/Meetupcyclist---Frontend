@@ -2,14 +2,12 @@ import React from "react";
 import LocationsAPI from "../../api/LocationsAPI";
 import { Link } from "react-router-dom";
 import {
+  Button,
   Card,
   CardBody,
   CardSubtitle,
   CardTitle,
-  UncontrolledTooltip,
 } from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookmark } from "@fortawesome/free-solid-svg-icons";
 import LocationIcon from "../../images/location_icon_default.png";
 
 const SaveLocationCard = ({ location, getSaves, setLoading }) => {
@@ -49,22 +47,15 @@ const SaveLocationCard = ({ location, getSaves, setLoading }) => {
           Created by: {location.firstName} {location.lastName}
         </CardSubtitle>
         <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
-          <div
-            id={`unsaveIcon-${location.id}`}
-            style={{
-              cursor: "pointer",
-              display: "inline-block",
-            }}
-            onClick={handleUnsave}
-          >
-            <FontAwesomeIcon icon={faBookmark} className="fa-xl" />
-            <UncontrolledTooltip
-              placement="top"
-              target={`unsaveIcon-${location.id}`}
+          {(
+            <Button
+              color="warning"
+              className="yellow-button"
+              onClick={handleUnsave}
             >
               Unsave
-            </UncontrolledTooltip>
-          </div>
+            </Button>
+          )}
         </div>
       </CardBody>
     </Card>

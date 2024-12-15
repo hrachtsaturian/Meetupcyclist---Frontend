@@ -19,7 +19,7 @@ const LocationEdit = () => {
 
   // first, find the location data
   useEffect(() => {
-    async function getData() {
+    const getData = async () => {
       try {
         const { name, description, address, pfpUrl } = await LocationsAPI.get(id);
 

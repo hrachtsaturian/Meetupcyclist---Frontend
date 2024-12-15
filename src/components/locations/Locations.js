@@ -15,7 +15,7 @@ const Locations = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
 
-  async function getLocations() {
+  const getLocations = async () => {
     try {
       const res = await LocationsAPI.getAll();
       setLocations(res);

@@ -19,7 +19,7 @@ const GroupEdit = () => {
 
   // first, find the group data
   useEffect(() => {
-    async function getData() {
+    const getData = async () => {
       try {
         const { name, description, pfpUrl, createdBy } = await GroupsAPI.get(id);
 

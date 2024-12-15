@@ -41,7 +41,7 @@ import GroupIcon from "../../images/group_icon_default.png";
 import EventsAPI from "../../api/EventsAPI";
 import PostsTable from "../shared/PostsTable";
 import GroupPostCard from "./GroupPostCard";
-import { formatData } from "../../helpers/helpers";
+import { formatDate } from "../../helpers/helpers";
 
 const Group = () => {
   const { id } = useParams();
@@ -88,14 +88,15 @@ const Group = () => {
 
   const getData = async () => {
     try {
-      // promise.all?
-      await getGroup();
-      await getGroupMembers();
-      await getGroupEvents();
-      await getGroupPosts();
+      await Promise.all([
+        getGroup(),
+        getGroupMembers(),
+        getGroupEvents(),
+        getGroupPosts(),
+      ]);
       setIsLoading(false);
     } catch (error) {
-      setError(error?.message);
+      setError(error[0]?.message || "Failed to get group");
     }
   };
 
@@ -188,6 +189,16 @@ const Group = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  function showAlertOnDelete() {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this group? This action not reversible."
+      )
+    ) {
+      handleDelete();
+    }
+  }
+
   if (error) {
     return (
       <div className="alert alert-danger" role="alert">
@@ -205,7 +216,6 @@ const Group = () => {
     await getMyEvents();
   };
   const toggleDropdown = () => setIsOpenDropdown((prev) => !prev);
-
 
   let sameUser = currentUser.id === group.createdBy;
   let isAdmin = currentUser.isAdmin === true;
@@ -247,47 +257,38 @@ const Group = () => {
                       </div>
                     </>
                   ) : null}
-                  {sameUser || isAdmin ? (
-                    <>
-                      <div
-                        id="editIcon"
-                        className="icon-wrapper"
-                        style={{
-                          cursor: "pointer",
-                          display: "inline-block",
-                        }}
-                        onClick={() => navigate(`/groups/${id}/edit`)}
-                      >
-                        <FontAwesomeIcon
-                          icon={faPenToSquare}
-                          className="fa-xl"
-                        />
-                        <UncontrolledTooltip
-                          placement="top"
-                          target="editIcon"
-                        >
-                          Edit
-                        </UncontrolledTooltip>
-                      </div>
-                      <div
-                        id="deleteIcon"
-                        className="icon-wrapper"
-                        style={{
-                          cursor: "pointer",
-                          display: "inline-block",
-                        }}
-                        onClick={handleDelete}
-                      >
-                        <FontAwesomeIcon icon={faTrash} className="fa-xl" />
-                        <UncontrolledTooltip
-                          placement="top"
-                          target="deleteIcon"
-                        >
-                          Delete
-                        </UncontrolledTooltip>
-                      </div>
-                    </>
-                  ) : null}
+                  {sameUser && (
+                    <div
+                      id="editIcon"
+                      className="icon-wrapper"
+                      style={{
+                        cursor: "pointer",
+                        display: "inline-block",
+                      }}
+                      onClick={() => navigate(`/groups/${id}/edit`)}
+                    >
+                      <FontAwesomeIcon icon={faPenToSquare} className="fa-xl" />
+                      <UncontrolledTooltip placement="top" target="editIcon">
+                        Edit
+                      </UncontrolledTooltip>
+                    </div>
+                  )}
+                  {(isAdmin || sameUser) && (
+                    <div
+                      id="deleteIcon"
+                      className="icon-wrapper"
+                      style={{
+                        cursor: "pointer",
+                        display: "inline-block",
+                      }}
+                      onClick={showAlertOnDelete}
+                    >
+                      <FontAwesomeIcon icon={faTrash} className="fa-xl" />
+                      <UncontrolledTooltip placement="top" target="deleteIcon">
+                        Delete
+                      </UncontrolledTooltip>
+                    </div>
+                  )}
                   <div
                     id="saveIcon"
                     className="icon-wrapper"
@@ -301,21 +302,19 @@ const Group = () => {
                       icon={isSaved ? faSolidBookmark : faRegularBookmark}
                       className="fa-xl"
                     />
-                    <UncontrolledTooltip
-                      placement="top"
-                      target="saveIcon"
-                    >
+                    <UncontrolledTooltip placement="top" target="saveIcon">
                       {isSaved ? "Unsave" : "Save"}
                     </UncontrolledTooltip>
                   </div>
-                  {!sameUser &&
+                  {!sameUser && (
                     <Button
                       color="warning"
                       className="yellow-button"
                       onClick={toggleMembership}
                     >
                       {isJoined ? "Leave" : "Join"}
-                    </Button>}
+                    </Button>
+                  )}
                 </div>
               </CardBody>
             </Card>
@@ -404,7 +403,7 @@ const Group = () => {
                         </CardTitle>
                         <hr></hr>
                         <CardText className="fs-6">
-                          {formatData(groupEvent.date)}
+                          {formatDate(groupEvent.date)}
                         </CardText>
                         <CardText>
                           Attendees: {groupEvent.attendeesCount}
@@ -457,7 +456,11 @@ const Group = () => {
                   </div>
                 </FormGroup>
               </Form>
-              <PostsTable posts={posts} getPosts={getGroupPosts} CardComponent={GroupPostCard} />
+              <PostsTable
+                posts={posts}
+                getPosts={getGroupPosts}
+                CardComponent={GroupPostCard}
+              />
             </div>
           </Col>
         </Row>

@@ -39,6 +39,7 @@ const Saves = () => {
       setLoading(false);
     } catch (err) {
       console.error("Error fetching saved data:", err);
+      setSaves([]);
       setLoading(false);
     }
   };

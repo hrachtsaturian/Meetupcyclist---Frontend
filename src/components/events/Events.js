@@ -12,7 +12,7 @@ const Events = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
 
-  async function getEvents() {
+  const getEvents = async () => {
     try {
       const res = await EventsAPI.getAll({ filter: { minDate: new Date() } });
       setEvents(res);

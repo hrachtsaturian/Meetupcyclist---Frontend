@@ -1,6 +1,6 @@
 import ImagesAPI from "../api/ImagesAPI";
 
-export const formatData = (date) => {
+export const formatDate = (date) => {
   return new Date(date).toLocaleString("en-US", {
     month: "long",
     day: "numeric",
@@ -11,7 +11,7 @@ export const formatData = (date) => {
   });
 };
 
-export const formatDataMY = (date) => {
+export const formatDateMY = (date) => {
   return new Date(date).toLocaleString("en-US", {
     month: "long",
     year: "numeric"
@@ -38,4 +38,4 @@ export const uploadImage = async (event, setFormData, setError) => {
 };
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default { formatData, formatDataMY, isPastEvent, uploadImage };
+export default { formatDate, formatDateMY, isPastEvent, uploadImage };

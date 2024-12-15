@@ -163,12 +163,6 @@ html {
   margin: 10px 0;
 }
 
-.loggedInPage {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-}
-
 .nav-container {
   display: flex;
   flex-wrap: inherit;

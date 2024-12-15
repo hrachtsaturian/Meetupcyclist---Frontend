@@ -19,11 +19,11 @@ const SavesTable = ({ saves, selectedFilter, getSaves, setLoading }) => {
         <p>You have nothing saved yet.</p>
       ) : (
         <>
-          {saves.map((save, i) => {
+          {saves.map((save) => {
             if (selectedFilter === "events") {
               return (
                 <SaveEventCard
-                  key={i}
+                  key={`event-${save.id}`}
                   event={save}
                   getSaves={getSaves}
                   setLoading={setLoading}
@@ -33,7 +33,7 @@ const SavesTable = ({ saves, selectedFilter, getSaves, setLoading }) => {
             if (selectedFilter === "groups") {
               return (
                 <SaveGroupCard
-                  key={i}
+                  key={`group-${save.id}`}
                   group={save}
                   getSaves={getSaves}
                   setLoading={setLoading}
@@ -43,7 +43,7 @@ const SavesTable = ({ saves, selectedFilter, getSaves, setLoading }) => {
             if (selectedFilter === "locations") {
               return (
                 <SaveLocationCard
-                  key={i}
+                  key={`lcoation-${save.id}`}
                   location={save}
                   getSaves={getSaves}
                   setLoading={setLoading}

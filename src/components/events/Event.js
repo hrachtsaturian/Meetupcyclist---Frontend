@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import EventsAPI from "../../api/EventsAPI";
 import Loader from "../Loader";
 import Context from "../Context";
-import { formatData, isPastEvent } from "../../helpers/helpers";
+import { formatDate, isPastEvent } from "../../helpers/helpers";
 import {
   Container,
   Row,
@@ -70,13 +70,10 @@ const Event = () => {
 
   const getData = async () => {
     try {
-      // promise.all?
-      await getEvent();
-      await getEventAttendees();
-      await getEventPosts();
+      await Promise.all([getEvent(), getEventAttendees(), getEventPosts()]);
       setIsLoading(false);
     } catch (error) {
-      setError(error?.message);
+      setError(error[0]?.message || "Failed to get event");
     }
   };
 
@@ -100,7 +97,6 @@ const Event = () => {
     }
   };
 
-  // do we need loading state to prevent double click?
   const toggleAttendance = async () => {
     try {
       if (isAttending) {
@@ -116,8 +112,6 @@ const Event = () => {
     }
   };
 
-
-  // do we need loading state to prevent double click?
   const toggleSave = async () => {
     try {
       if (isSaved) {
@@ -136,6 +130,16 @@ const Event = () => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  function showAlertOnDelete() {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this group? This action not reversible."
+      )
+    ) {
+      handleDelete();
+    }
+  }
 
   if (error) {
     return (
@@ -175,47 +179,38 @@ const Event = () => {
               />
               <CardBody>
                 <div className="icon-button-row">
-                  {sameUser || isAdmin ? (
-                    <>
-                      <div
-                        id="editIcon"
-                        className="icon-wrapper"
-                        style={{
-                          cursor: "pointer",
-                          display: "inline-block",
-                        }}
-                        onClick={() => navigate(`/events/${id}/edit`)}
-                      >
-                        <FontAwesomeIcon
-                          icon={faPenToSquare}
-                          className="fa-xl"
-                        />
-                        <UncontrolledTooltip
-                          placement="top"
-                          target="editIcon"
-                        >
-                          Edit
-                        </UncontrolledTooltip>
-                      </div>
-                      <div
-                        id="deleteIcon"
-                        className="icon-wrapper"
-                        style={{
-                          cursor: "pointer",
-                          display: "inline-block",
-                        }}
-                        onClick={handleDelete}
-                      >
-                        <FontAwesomeIcon icon={faTrash} className="fa-xl" />
-                        <UncontrolledTooltip
-                          placement="top"
-                          target="deleteIcon"
-                        >
-                          Delete
-                        </UncontrolledTooltip>
-                      </div>
-                    </>
-                  ) : null}
+                  {sameUser && (
+                    <div
+                      id="editIcon"
+                      className="icon-wrapper"
+                      style={{
+                        cursor: "pointer",
+                        display: "inline-block",
+                      }}
+                      onClick={() => navigate(`/events/${id}/edit`)}
+                    >
+                      <FontAwesomeIcon icon={faPenToSquare} className="fa-xl" />
+                      <UncontrolledTooltip placement="top" target="editIcon">
+                        Edit
+                      </UncontrolledTooltip>
+                    </div>
+                  )}
+                  {(isAdmin || sameUser) && (
+                    <div
+                      id="deleteIcon"
+                      className="icon-wrapper"
+                      style={{
+                        cursor: "pointer",
+                        display: "inline-block",
+                      }}
+                      onClick={showAlertOnDelete}
+                    >
+                      <FontAwesomeIcon icon={faTrash} className="fa-xl" />
+                      <UncontrolledTooltip placement="top" target="deleteIcon">
+                        Delete
+                      </UncontrolledTooltip>
+                    </div>
+                  )}
                   <div
                     id="saveIcon"
                     className="icon-wrapper"
@@ -229,10 +224,7 @@ const Event = () => {
                       icon={isSaved ? faSolidBookmark : faRegularBookmark}
                       className="fa-xl"
                     />
-                    <UncontrolledTooltip
-                      placement="top"
-                      target="saveIcon"
-                    >
+                    <UncontrolledTooltip placement="top" target="saveIcon">
                       {isSaved ? "Unsave" : "Save"}
                     </UncontrolledTooltip>
                   </div>
@@ -278,7 +270,7 @@ const Event = () => {
                 }}
               >
                 <Badge color="secondary" className="me-2">
-                  <h6>{formatData(event.date)}</h6>
+                  <h6>{formatDate(event.date)}</h6>
                 </Badge>
                 <Badge color="dark" className="me-2">
                   <h6>{event.location}</h6>
@@ -362,11 +354,15 @@ const Event = () => {
                   </div>
                 </FormGroup>
               </Form>
-              <PostsTable posts={posts} getPosts={getEventPosts} CardComponent={EventPostCard} />
+              <PostsTable
+                posts={posts}
+                getPosts={getEventPosts}
+                CardComponent={EventPostCard}
+              />
             </div>
           </Col>
         </Row>
-      </Container >
+      </Container>
     </>
   );
 };

@@ -2,16 +2,14 @@ import React from "react";
 import EventsAPI from "../../api/EventsAPI";
 import { Link } from "react-router-dom";
 import {
+  Button,
   Card,
   CardBody,
   CardSubtitle,
   CardText,
   CardTitle,
-  UncontrolledTooltip,
 } from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookmark } from "@fortawesome/free-solid-svg-icons";
-import { formatData } from "../../helpers/helpers";
+import { formatDate } from "../../helpers/helpers";
 import EventIcon from "../../images/event_icon_default.png";
 
 const SaveEventCard = ({ event, getSaves, setLoading }) => {
@@ -48,7 +46,7 @@ const SaveEventCard = ({ event, getSaves, setLoading }) => {
       <CardBody>
         <CardText>
           <b>
-            <medium className="text-muted">{formatData(event.date)}</medium>
+            <medium className="text-muted">{formatDate(event.date)}</medium>
           </b>
         </CardText>
         <CardTitle className="fs-4">{event.title}</CardTitle>
@@ -56,22 +54,15 @@ const SaveEventCard = ({ event, getSaves, setLoading }) => {
           Organizer: {event.firstName} {event.lastName}
         </CardSubtitle>
         <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
-          <div
-            id={`unsaveIcon-${event.id}`}
-            style={{
-              cursor: "pointer",
-              display: "inline-block",
-            }}
-            onClick={handleUnsave}
-          >
-            <FontAwesomeIcon icon={faBookmark} className="fa-xl" />
-            <UncontrolledTooltip
-              placement="top"
-              target={`unsaveIcon-${event.id}`}
+          {(
+            <Button
+              color="warning"
+              className="yellow-button"
+              onClick={handleUnsave}
             >
               Unsave
-            </UncontrolledTooltip>
-          </div>
+            </Button>
+          )}
         </div>
       </CardBody>
     </Card>

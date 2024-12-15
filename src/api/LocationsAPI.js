@@ -1,3 +1,4 @@
+import qs from "qs";
 import BaseAPI from "./BaseAPI";
 
 /**
@@ -20,7 +21,7 @@ class LocationsAPI extends BaseAPI {
   }
 
   static async getAll({ isSaved = false } = {}) {
-    const query = new URLSearchParams({ isSaved });
+    const query = qs.stringify({ isSaved });
     const res = await this.request({ path: `locations?${query.toString()}` });
     return res.data;
   }

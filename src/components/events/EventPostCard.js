@@ -14,7 +14,7 @@ import {
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons/faPenToSquare";
 import ProfileIcon from "../../images/profile_icon_default.png";
-import { formatData } from "../../helpers/helpers";
+import { formatDate } from "../../helpers/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EventsAPI from "../../api/EventsAPI";
 import Context from "../Context";
@@ -80,7 +80,7 @@ const EventPostCard = ({ post, getPosts }) => {
     const userFullName = `${post.firstName} ${post.lastName}`;
     const displayName = post.userId === post.eventOrganizer ? `${userFullName} (Event Admin)` : userFullName;
     const displayText = isEditing ? showInput() : post.text;
-    const displayDate = `${formatData(post.createdAt)}${post.updatedAt ? " (edited)" : ""}`;
+    const displayDate = `${formatDate(post.createdAt)}${post.updatedAt ? " (edited)" : ""}`;
 
     return (
         <Card className="my-2">

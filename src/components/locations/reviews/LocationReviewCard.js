@@ -14,7 +14,7 @@ import {
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons/faPenToSquare";
 import ProfileIcon from "../../../images/profile_icon_default.png";
-import { formatData } from "../../../helpers/helpers";
+import { formatDate } from "../../../helpers/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import LocationsAPI from "../../../api/LocationsAPI";
 import Context from "../../Context";
@@ -92,7 +92,7 @@ const LocationReviewCard = ({ locationReview, getReviews }) => {
       ? `${userFullName} (Admin)`
       : userFullName;
   const displayText = isEditing ? showInput() : locationReview.text;
-  const displayDate = `${formatData(locationReview.createdAt)}${locationReview.updatedAt ? " (edited)" : ""
+  const displayDate = `${formatDate(locationReview.createdAt)}${locationReview.updatedAt ? " (edited)" : ""
     }`;
 
   return (
