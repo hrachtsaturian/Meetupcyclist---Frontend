@@ -98,8 +98,6 @@ const NavBar = ({ logout = () => {} }) => {
             className="nav-links"
             isOpen={isProfileDropdownOpen}
             toggle={toggleProfileDropdown}
-            onMouseEnter={toggleProfileDropdown}
-            onMouseLeave={toggleProfileDropdown}
           >
             <DropdownToggle className="profile-tag" nav caret>
               <FontAwesomeIcon icon={faUser} className="me-2" />

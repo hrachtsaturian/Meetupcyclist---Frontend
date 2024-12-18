@@ -165,7 +165,7 @@ const EventEdit = () => {
         <Label for="exampleDate" sm={2}>
           Date
         </Label>
-        <Col sm={2}>
+        <Col sm={2} style={{ width: '300px'}}>
           <DatePicker
             id="datePicker"
             selected={formData.date ? new Date(formData.date) : null}
