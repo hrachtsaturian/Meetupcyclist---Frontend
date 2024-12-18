@@ -42,7 +42,7 @@ The following APIs were used for:
 ### Live Demo
 Check out the live demo: MeetupCyclist on Render
 
-https://.onrender.com
+https://meetupcyclist.onrender.com/
 
 ### Project Breakdown
 #### Database Models
