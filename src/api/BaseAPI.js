@@ -2,7 +2,7 @@ import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3001";
 
-/** 
+/**
  * Base API Class
  */
 class BaseAPI {
@@ -15,17 +15,20 @@ class BaseAPI {
     const url = `${BASE_URL}/${path}`;
     const params = method === "get" ? data : {};
     const headers = {};
-  
+
     if (this.token) {
       headers.Authorization = `Bearer ${this.token}`;
     }
 
     try {
       return (await axios({ url, method, data, params, headers })).data;
-    } catch (err) {
-      console.error("API Error:", err?.response);
-      const message = err?.response?.data?.error?.message || err.message || 'Unexpected error';
-      throw Array.isArray(message) ? message : [message];
+    } catch (e) {
+      console.error("API Error:", e?.response);
+      const message =
+        e?.response?.data?.error?.message ||
+        e.message ||
+        "Unexpected error";
+      throw new Error(message);
     }
   }
 }

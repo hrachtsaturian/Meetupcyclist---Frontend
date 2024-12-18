@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from "react";
+import { ButtonGroup, Button } from "reactstrap";
 import AttendingEventsTable from "./AttendingEventsTable";
 import EventsAPI from "../../api/EventsAPI";
 import Loader from "../Loader";
-import { ButtonGroup, Button } from "reactstrap";
 
 const AttendingEvents = () => {
   const [attendingEvents, setAttendingEvents] = useState([]);
   // selector by default - upcoming
   const [selectedFilter, setSelectedFilter] = useState("upcoming");
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState();
 
   const getAttendingEventsApiRequest = async () => {
     if (selectedFilter === "upcoming") {
       const upcomingEvents = await EventsAPI.getAll({
-        filter: { isAttending: true, minDate: new Date() }
+        filter: { isAttending: true, minDate: new Date() },
       });
       return upcomingEvents;
     }
     if (selectedFilter === "past") {
       const pastEvents = await EventsAPI.getAll({
         filter: { isAttending: true, maxDate: new Date() },
-        sort: { date: 'DESC' }
+        sort: { date: "DESC" },
       });
       return pastEvents;
     }
@@ -28,15 +29,15 @@ const AttendingEvents = () => {
   };
 
   const getAttendingEvents = async () => {
+    setIsLoading(true);
     try {
-      setLoading(true);
       const events = await getAttendingEventsApiRequest();
       setAttendingEvents(events);
-      setLoading(false);
-    } catch (err) {
-      console.error("Error fetching attending events:", err);
-      setLoading(false);
+    } catch (e) {
+      setError(e?.message || "Error fetching attending events");
+      setAttendingEvents([]); // override with empty array since we are changing the filter
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -71,13 +72,18 @@ const AttendingEvents = () => {
           </Button>
         </ButtonGroup>
       </div>
-      {loading ? (
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
+      {isLoading ? (
         <Loader />
       ) : (
         <AttendingEventsTable
           attendingEvents={attendingEvents}
           getAttendingEvents={getAttendingEvents}
-          setLoading={setLoading}
+          setError={setError}
         />
       )}
     </>

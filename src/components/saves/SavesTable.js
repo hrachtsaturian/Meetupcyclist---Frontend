@@ -3,7 +3,7 @@ import SaveEventCard from "./SaveEventCard";
 import SaveGroupCard from "./SaveGroupCard";
 import SaveLocationCard from "./SaveLocationCard";
 
-const SavesTable = ({ saves, selectedFilter, getSaves, setLoading }) => {
+const SavesTable = ({ saves, selectedFilter, getSaves, setError }) => {
   return (
     <div
       className="saves-table"
@@ -12,7 +12,7 @@ const SavesTable = ({ saves, selectedFilter, getSaves, setLoading }) => {
         flexWrap: "wrap",
         gap: "16px",
         justifyContent: "center",
-        paddingTop: "20px"
+        paddingTop: "20px",
       }}
     >
       {saves.length === 0 ? (
@@ -26,7 +26,7 @@ const SavesTable = ({ saves, selectedFilter, getSaves, setLoading }) => {
                   key={`event-${save.id}`}
                   event={save}
                   getSaves={getSaves}
-                  setLoading={setLoading}
+                  setError={setError}
                 />
               );
             }
@@ -36,7 +36,7 @@ const SavesTable = ({ saves, selectedFilter, getSaves, setLoading }) => {
                   key={`group-${save.id}`}
                   group={save}
                   getSaves={getSaves}
-                  setLoading={setLoading}
+                  setError={setError}
                 />
               );
             }
@@ -46,7 +46,7 @@ const SavesTable = ({ saves, selectedFilter, getSaves, setLoading }) => {
                   key={`lcoation-${save.id}`}
                   location={save}
                   getSaves={getSaves}
-                  setLoading={setLoading}
+                  setError={setError}
                 />
               );
             }

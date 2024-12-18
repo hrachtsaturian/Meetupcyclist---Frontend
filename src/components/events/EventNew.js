@@ -14,9 +14,10 @@ const EventNew = () => {
     description: "",
     date: "",
     location: "",
-    pfpUrl: ""
+    pfpUrl: "",
   });
   const [groupToLink, setGroupToLink] = useState();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
   const navigate = useNavigate();
 
@@ -27,17 +28,17 @@ const EventNew = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
-      // issue with creating event - title and description are missing
       const newEvent = await EventsAPI.create(formData);
       if (groupToLink) {
         await GroupsAPI.linkEvent(groupToLink.id, newEvent.id);
       }
       navigate(`/events/${newEvent.id}`);
-    } catch (error) {
-      console.log(error);
-      setError(error?.message || "Failed to create event");
+    } catch (e) {
+      setError(e?.message || "Failed to create event");
     }
+    setIsSubmitting(false);
   };
 
   const handleUploadImage = async (e) => {
@@ -49,20 +50,24 @@ const EventNew = () => {
       try {
         const group = await GroupsAPI.get(groupId);
         setGroupToLink(group);
-      } catch (error) {
+      } catch (e) {
         // silent error
-        console.log(error);
       }
-    }
+    };
 
     if (groupId) {
       getGroup();
     }
-  }, [groupId])
+  }, [groupId]);
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <h3 style={{ fontSize: "40px" }} className="text-center mb-2 meetupcyclist">New Event</h3>
+    <Form onSubmit={handleSubmit} className="container">
+      <h3
+        style={{ fontSize: "40px" }}
+        className="text-center mb-2 meetupcyclist"
+      >
+        New Event
+      </h3>
       <hr></hr>
       <FormGroup row style={{ paddingTop: "40px" }}>
         <Label for="exampleTitle" sm={2}>
@@ -141,10 +146,20 @@ const EventNew = () => {
             timeIntervals={15}
           />
         </Col>
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-            <Button color="warning" className="yellow-button">
-              Submit
-            </Button>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <Button
+            color="warning"
+            className="yellow-button"
+            disabled={isSubmitting}
+          >
+            Submit
+          </Button>
         </div>
       </FormGroup>
       {error && (

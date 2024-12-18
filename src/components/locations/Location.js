@@ -37,6 +37,7 @@ const Location = () => {
   const [reviews, setReviews] = useState();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
   const [isSaved, setIsSaved] = useState(false);
 
@@ -58,43 +59,45 @@ const Location = () => {
     try {
       await Promise.all([getLocation(), getLocationReviews()]);
       setIsLoading(false);
-    } catch (error) {
-      setError(error[0]?.message || "Failed to get location");
+    } catch (e) {
+      setError(e?.message || "Failed to get location");
     }
   };
   const handleDelete = async () => {
     try {
       await LocationsAPI.delete(id);
       navigate("/locations");
-    } catch (error) {
-      setError("Failed to delete the location");
+    } catch (e) {
+      setError(e?.message || "Failed to delete the location");
     }
   };
 
   const handleCreateReview = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       await LocationsAPI.createReview(id, newReviewText, newReviewRate);
       await getLocationReviews();
       setNewReviewText("");
       setNewReviewRate(0);
-    } catch (error) {
-      setError("Failed to create new review");
+    } catch (e) {
+      setError(e?.message || "Failed to create new review");
     }
+    setIsSubmitting(false);
   };
 
-  // do we need loading state to prevent double click?
   const toggleSave = async () => {
     try {
       if (isSaved) {
+        setIsSaved(false); // optimistic update
         await LocationsAPI.removeSave(id); // Unsave the location
-        setIsSaved(false);
       } else {
-        await LocationsAPI.makeSave(id); // Save the location
         setIsSaved(true);
+        await LocationsAPI.makeSave(id); // Save the location
       }
-    } catch (error) {
-      setError(error?.message);
+    } catch (e) {
+      setError(e?.message);
+      setIsSaved((prev) => !prev); // revert
     }
   };
 
@@ -103,9 +106,19 @@ const Location = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  function showAlertOnDelete() {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this location? This action not reversible."
+      )
+    ) {
+      handleDelete();
+    }
+  }
+
   if (error) {
     return (
-      <div class="alert alert-danger" role="alert">
+      <div class="alert alert-danger container" role="alert">
         {error || "Failed to find location info"}
       </div>
     );
@@ -165,7 +178,7 @@ const Location = () => {
                           cursor: "pointer",
                           display: "inline-block",
                         }}
-                        onClick={handleDelete}
+                        onClick={showAlertOnDelete}
                       >
                         <FontAwesomeIcon icon={faTrash} className="fa-xl" />
                         <UncontrolledTooltip
@@ -209,11 +222,11 @@ const Location = () => {
                   </b>
                 </Link>
               </CardSubtitle>
-                <br></br>
-                <CardSubtitle>
-                  Average Rating: {location.avgRating} / 5
-                </CardSubtitle>
-                <br></br>
+              <br></br>
+              <CardSubtitle>
+                Average Rating: {location.avgRating} / 5
+              </CardSubtitle>
+              <br></br>
               <CardText
                 style={{
                   marginTop: "20px",
@@ -240,6 +253,7 @@ const Location = () => {
                 Reviews
               </CardTitle>
               <LocationReviewForm
+                isSubmitting={isSubmitting}
                 newReviewText={newReviewText}
                 newReviewRate={newReviewRate}
                 setNewReviewText={setNewReviewText}

@@ -9,7 +9,7 @@ class ImagesAPI extends BaseAPI {
     const res = await this.request({
       path: `uploadImage`,
       method: "post",
-      data: formData
+      data: formData,
     });
     return res.data;
   }

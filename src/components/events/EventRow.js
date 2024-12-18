@@ -17,47 +17,48 @@ import EventIcon from "../../images/event_icon_default.png";
 
 const EventRow = ({ event }) => {
   const [isSaved, setIsSaved] = useState(event.isSaved);
+  const [error, setError] = useState(null);
 
-
-  // do we need loading state to prevent double click?
   const toggleSave = async () => {
-    if (isSaved) {
-      await EventsAPI.removeSave(event.id); // Unsave the event
-      setIsSaved(false);
-    } else {
-      await EventsAPI.makeSave(event.id); // Save the event
-      setIsSaved(true);
+    try {
+      if (isSaved) {
+        setIsSaved(false);
+        await EventsAPI.removeSave(event.id); // Unsave the event
+      } else {
+        setIsSaved(true);
+        await EventsAPI.makeSave(event.id); // Save the event
+      }
+    } catch (e) {
+      setError(e?.message || "Failed to save/unsave event");
+      setIsSaved((prev) => !prev); // revert
     }
   };
 
-
   return (
-    <Card className="my-2" tag={Link} to={`/events/${event.id}`} style={{ width: '700px' }}>
-      <div style={{ display: 'flex' }}>
+    <Card
+      className="my-2"
+      tag={Link}
+      to={`/events/${event.id}`}
+      style={{ width: "700px" }}
+    >
+      <div style={{ display: "flex" }}>
         <CardImg
           alt="event-main-photo"
-          src={event.pfpUrl || EventIcon
-          }
+          src={event.pfpUrl || EventIcon}
           style={{
-            width: '200px',
-            height: '200px',
-            objectFit: 'contain'
+            width: "200px",
+            height: "200px",
+            objectFit: "contain",
           }}
         />
-        <CardBody style={{ position: "relative", textAlign: 'left' }}>
-          <CardTitle className="fs-4">
-            {event.title}
-          </CardTitle>
+        <CardBody>
+          <CardTitle className="fs-4">{event.title}</CardTitle>
           <CardSubtitle>
             Organizer: {event.firstName} {event.lastName}
           </CardSubtitle>
           <hr></hr>
-          <CardTitle className="fs-5">
-            {formatDate(event.date)}
-          </CardTitle>
-          <CardSubtitle>
-            Attendees: {event.attendeesCount}
-          </CardSubtitle>
+          <CardTitle className="fs-5">{formatDate(event.date)}</CardTitle>
+          <CardSubtitle>Attendees: {event.attendeesCount}</CardSubtitle>
           <div
             id={`saveIcon-${event.id}`}
             style={{
@@ -83,6 +84,15 @@ const EventRow = ({ event }) => {
               {isSaved ? "Unsave" : "Save"}
             </UncontrolledTooltip>
           </div>
+          {error && (
+            <div
+              className="alert alert-danger"
+              role="alert"
+              style={{ marginBottom: "20px" }}
+            >
+              {error}
+            </div>
+          )}
         </CardBody>
       </div>
     </Card>

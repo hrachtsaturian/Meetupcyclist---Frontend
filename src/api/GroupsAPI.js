@@ -6,7 +6,6 @@ import BaseAPI from "./BaseAPI";
  *
  */
 class GroupsAPI extends BaseAPI {
-
   static async create(data) {
     const res = await this.request({
       path: `groups`,
@@ -79,6 +78,7 @@ class GroupsAPI extends BaseAPI {
     return res.data;
   }
 
+  // get recent group posts // GET groupposts/recent
   static async getRecentPosts() {
     const res = await this.request({
       path: `groupposts/recent`,

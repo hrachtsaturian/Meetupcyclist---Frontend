@@ -1,11 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-  Card,
-  CardBody,
-  CardSubtitle,
-  CardTitle,
-} from "reactstrap";
+import { Card, CardBody, CardSubtitle, CardTitle } from "reactstrap";
 import EventIcon from "../../images/event_icon_default.png";
 import { formatDate } from "../../helpers/helpers";
 
@@ -23,9 +18,9 @@ const UserEventCard = ({ event }) => {
           alt="event-main-photo"
           src={event.pfpUrl || EventIcon}
           style={{
-            width: '100px',
-            height: '100px',
-            objectFit: 'contain'
+            width: "100px",
+            height: "100px",
+            objectFit: "contain",
           }}
         />
         <CardBody>

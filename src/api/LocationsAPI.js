@@ -53,7 +53,7 @@ class LocationsAPI extends BaseAPI {
     const res = await this.request({
       path: `locations/${id}/reviews`,
       method: "post",
-      data: { text: newReviewText, rate: newReviewRate }
+      data: { text: newReviewText, rate: newReviewRate },
     });
     return res.data;
   }
@@ -63,7 +63,7 @@ class LocationsAPI extends BaseAPI {
     const res = await this.request({
       path: `locationreviews/${id}`,
       method: "patch",
-      data: { text: newReviewText, rate: newReviewRate }
+      data: { text: newReviewText, rate: newReviewRate },
     });
     return res.data;
   }

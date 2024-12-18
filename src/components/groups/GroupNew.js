@@ -8,8 +8,9 @@ const GroupNew = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    pfpUrl: ""
+    pfpUrl: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
   const navigate = useNavigate();
 
@@ -20,14 +21,14 @@ const GroupNew = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
-      // issue with creating group - name and description are missing
       const newGroup = await GroupsAPI.create(formData);
       navigate(`/groups/${newGroup.id}`);
-    } catch (error) {
-      console.log(error);
-      setError(error?.message || "Failed to create group");
+    } catch (e) {
+      setError(e?.message || "Failed to create group");
     }
+    setIsSubmitting(false);
   };
 
   const handleUploadImage = async (e) => {
@@ -35,7 +36,7 @@ const GroupNew = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} className="container">
       <h3
         style={{ fontSize: "40px" }}
         className="text-center mb-2 meetupcyclist"
@@ -85,10 +86,20 @@ const GroupNew = () => {
             onChange={handleUploadImage}
           />
         </Col>
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-            <Button color="warning" className="yellow-button">
-              Submit
-            </Button>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <Button
+            color="warning"
+            className="yellow-button"
+            disabled={isSubmitting}
+          >
+            Submit
+          </Button>
         </div>
       </FormGroup>
       {error && (

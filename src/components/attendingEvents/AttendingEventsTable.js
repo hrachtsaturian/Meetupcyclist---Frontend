@@ -4,7 +4,7 @@ import AttendingEventCard from "./AttendingEventCard";
 const AttendingEventsTable = ({
   attendingEvents,
   getAttendingEvents,
-  setLoading,
+  setError,
 }) => {
   return (
     <div
@@ -27,7 +27,7 @@ const AttendingEventsTable = ({
                 key={i}
                 attendingEvent={attendingEvent}
                 getAttendingEvents={getAttendingEvents}
-                setLoading={setLoading}
+                setError={setError}
               />
             );
           })}

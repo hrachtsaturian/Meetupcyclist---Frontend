@@ -1,25 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import LocationsAPI from "../../api/LocationsAPI";
 import { Link } from "react-router-dom";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardSubtitle,
-  CardTitle,
-} from "reactstrap";
+import { Button, Card, CardBody, CardSubtitle, CardTitle } from "reactstrap";
 import LocationIcon from "../../images/location_icon_default.png";
 
-const SaveLocationCard = ({ location, getSaves, setLoading }) => {
+const SaveLocationCard = ({ location, getSaves, setError }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleUnsave = async (e) => {
     e.preventDefault(); // Prevent navigation due to card link
-    setLoading(true);
+    setIsLoading(true);
     try {
       await LocationsAPI.removeSave(location.id);
       await getSaves();
-    } catch (error) {
-      console.error("Error unsaving the location:", error);
+    } catch (e) {
+      setError(e?.message || "Error unsaving the location");
     }
+    setIsLoading(false);
   };
 
   return (
@@ -35,8 +32,8 @@ const SaveLocationCard = ({ location, getSaves, setLoading }) => {
           src={location.pfpUrl || LocationIcon}
           alt="location-main-photo"
           style={{
-            width: '200px',
-            height: '200px',
+            width: "200px",
+            height: "200px",
             objectFit: "contain",
           }}
         />
@@ -46,16 +43,23 @@ const SaveLocationCard = ({ location, getSaves, setLoading }) => {
         <CardSubtitle>
           Created by: {location.firstName} {location.lastName}
         </CardSubtitle>
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
-          {(
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "10px",
+          }}
+        >
+          {
             <Button
               color="warning"
               className="yellow-button"
+              disabled={isLoading}
               onClick={handleUnsave}
             >
               Unsave
             </Button>
-          )}
+          }
         </div>
       </CardBody>
     </Card>

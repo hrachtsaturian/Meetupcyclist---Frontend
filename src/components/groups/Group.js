@@ -36,7 +36,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faBookmark as faRegularBookmark } from "@fortawesome/free-regular-svg-icons";
 import ProfileIcon from "../../images/profile_icon_default.png";
-import EventIcon from "../../images/event_icon_default.png";
 import GroupIcon from "../../images/group_icon_default.png";
 import EventsAPI from "../../api/EventsAPI";
 import PostsTable from "../shared/PostsTable";
@@ -55,6 +54,8 @@ const Group = () => {
   const [posts, setPosts] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmittingPost, setIsSubmittingPost] = useState(false);
   const [error, setError] = useState();
   const [isJoined, setIsJoined] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -95,8 +96,8 @@ const Group = () => {
         getGroupPosts(),
       ]);
       setIsLoading(false);
-    } catch (error) {
-      setError(error[0]?.message || "Failed to get group");
+    } catch (e) {
+      setError(e?.message || "Failed to get group");
     }
   };
 
@@ -108,79 +109,85 @@ const Group = () => {
       const groupEventsIds = groupEvents?.map(({ id }) => id);
       const filteredRes = res.filter((e) => !groupEventsIds.includes(e.id));
       setMyEvents(filteredRes);
-    } catch (error) {
-      setError(error?.message);
+    } catch (e) {
+      setError(e?.message);
     }
   };
 
   const linkEvent = async () => {
+    setIsSubmitting(true);
     try {
       await GroupsAPI.linkEvent(group.id, selectedEventToLink.id);
       await getGroupEvents();
       setSelectedEventToLink();
       setIsOpenCanvas(false);
-    } catch (error) {
-      setError(error?.message);
+    } catch (e) {
+      setError(e?.message);
     }
+    setIsSubmitting(false);
   };
 
   const unlinkEvent = async (eventId) => {
+    setIsSubmitting(true);
     try {
       await GroupsAPI.unlinkEvent(group.id, eventId);
       await getGroupEvents();
-    } catch (error) {
-      setError(error?.message);
+    } catch (e) {
+      setError(e?.message);
     }
+    setIsSubmitting(false);
   };
 
   const handleDelete = async () => {
     try {
       await GroupsAPI.delete(id);
       navigate("/groups");
-    } catch (error) {
-      setError("Failed to delete the group");
+    } catch (e) {
+      setError(e?.message || "Failed to delete the group");
     }
   };
 
   const handleCreatePost = async (e) => {
     e.preventDefault();
+    setIsSubmittingPost(true);
     try {
       await GroupsAPI.createPost(id, newPostText);
       await getGroupPosts();
       setNewPostText("");
-    } catch (error) {
-      setError("Failed to create new post");
+    } catch (e) {
+      setError(e?.message || "Failed to create new post");
     }
+    setIsSubmittingPost(false);
   };
 
-  // do we need loading state to prevent double click?
   const toggleMembership = async () => {
     try {
       if (isJoined) {
+        setIsJoined(false); // optimistic update
         await GroupsAPI.leave(id); // Leave the group
-        setIsJoined(false);
       } else {
-        await GroupsAPI.join(id); // Join the group
         setIsJoined(true);
+        await GroupsAPI.join(id); // Join the group
       }
       await getGroupMembers();
-    } catch (error) {
-      setError(error?.message);
+    } catch (e) {
+      setError(e?.message);
+      setIsJoined((prev) => !prev); // revert
     }
   };
 
-  // do we need loading state to prevent double click?
   const toggleSave = async () => {
     try {
       if (isSaved) {
-        await GroupsAPI.removeSave(id); // Unsave the group
         setIsSaved(false);
+        await GroupsAPI.removeSave(id); // Unsave the group
       } else {
-        await GroupsAPI.makeSave(id); // Save the group
         setIsSaved(true);
+        await GroupsAPI.makeSave(id); // Save the group
       }
-    } catch (error) {
-      setError(error?.message);
+    } catch (e) {
+      setError(e?.message);
+      setIsSaved((prev) => !prev); // revert
     }
   };
 
@@ -339,7 +346,7 @@ const Group = () => {
         </Row>
         {/* Members Section */}
         <Row className="mt-4">
-          <Col md="4">
+          <Col md="5">
             <div style={{ padding: "12px" }}>
               <CardTitle tag="h4" style={{ marginBottom: "8px" }}>
                 Members: {members?.length || 0}
@@ -374,7 +381,9 @@ const Group = () => {
                 })}
               </div>
             </div>
+
             {/* Group Events Section */}
+            <Row className="mt-4">
             <div style={{ padding: "12px" }}>
               <CardTitle tag="h4" style={{ marginBottom: "8px" }}>
                 Upcoming group events: {groupEvents.length}
@@ -386,15 +395,7 @@ const Group = () => {
                     tag={Link}
                     to={`/events/${groupEvent.id}`}
                   >
-                    <div style={{ display: "flex", width: "400px" }}>
-                      <CardImg
-                        alt="event-main-photo"
-                        src={groupEvent.pfpUrl || EventIcon}
-                        style={{
-                          width: "120px",
-                          objectFit: "contain",
-                        }}
-                      />
+                    <div style={{ display: "flex" }}>
                       <CardBody
                         style={{ position: "relative", textAlign: "left" }}
                       >
@@ -415,6 +416,7 @@ const Group = () => {
                               e.preventDefault();
                               unlinkEvent(groupEvent.id);
                             }}
+                            disabled={isSubmitting}
                           >
                             Unlink
                           </Button>
@@ -425,9 +427,10 @@ const Group = () => {
                 );
               })}
             </div>
+            </Row>
           </Col>
           {/* Group Posts Section */}
-          <Col md="8">
+          <Col md="7">
             <div style={{ padding: "12px" }}>
               <CardTitle tag="h4" style={{ marginBottom: "8px" }}>
                 Feed
@@ -448,7 +451,7 @@ const Group = () => {
                       <Button
                         color="warning"
                         className="yellow-button"
-                        disabled={!newPostText?.trim()}
+                        disabled={!newPostText?.trim() || isSubmittingPost}
                       >
                         Submit
                       </Button>
@@ -525,6 +528,7 @@ const Group = () => {
                 color="warning"
                 disable={!selectedEventToLink}
                 onClick={linkEvent}
+                disabled={isSubmitting}
               >
                 Submit
               </Button>

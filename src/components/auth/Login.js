@@ -8,6 +8,7 @@ const Login = ({ login }) => {
     email: "",
     password: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
   const navigate = useNavigate();
 
@@ -18,19 +19,26 @@ const Login = ({ login }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const token = await UsersAPI.authenticate(formData);
       await login(token);
       navigate("/");
-    } catch (error) {
-      console.log(error);
-      setError(error?.message || "Failed to sign in");
+    } catch (e) {
+      setError(e?.message || "Failed to login in");
     }
+    setIsSubmitting(false);
   };
+
   return (
     <div className="loginPage">
       <Form onSubmit={handleSubmit} className="loginForm">
-        <h3 style={{ fontSize: "40px" }} className="text-center mb-2 meetupcyclist">Log In</h3>
+        <h3
+          style={{ fontSize: "40px" }}
+          className="text-center mb-2 meetupcyclist"
+        >
+          Log In
+        </h3>
         <FormGroup row>
           <Label for="exampleEmail" sm={2}>
             Email
@@ -62,12 +70,22 @@ const Login = ({ login }) => {
         <FormGroup check row>
           <Col sm={11}>
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <Button color="warning" className="yellow-button">Submit</Button>
+              <Button
+                color="warning"
+                className="yellow-button"
+                disabled={isSubmitting}
+              >
+                Submit
+              </Button>
             </div>
           </Col>
         </FormGroup>
         {error && (
-          <div className="alert alert-danger" role="alert">
+          <div
+            className="alert alert-danger"
+            role="alert"
+            style={{ marginTop: "10px" }}
+          >
             {error}
           </div>
         )}

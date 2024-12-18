@@ -18,10 +18,10 @@ const Groups = () => {
       setGroups(res);
       setFilteredGroups(res);
       setIsLoading(false);
-    } catch (error) {
-      setError(error?.message || "Failed to find groups");
+    } catch (e) {
+      setError(e?.message || "Failed to find groups");
     }
-  }
+  };
 
   useEffect(() => {
     getGroups();
@@ -29,7 +29,7 @@ const Groups = () => {
 
   if (error) {
     return (
-      <div class="alert alert-danger" role="alert">
+      <div class="alert alert-danger container" role="alert">
         {error}
       </div>
     );
@@ -51,7 +51,7 @@ const Groups = () => {
         <div
           style={{
             display: "flex",
-            gap: "40px",
+            gap: "20px",
             justifyContent: "space-between",
           }}
         >
@@ -62,9 +62,9 @@ const Groups = () => {
             onSearchResults={setFilteredGroups}
           />
           <Link to="/groups/new">
-              <Button color="warning" className="yellow-button">
-                Create Group
-              </Button>
+            <Button color="warning" className="yellow-button">
+              Create Group
+            </Button>
           </Link>
         </div>
         <GroupsTable groups={filteredGroups} />

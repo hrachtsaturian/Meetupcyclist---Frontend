@@ -5,25 +5,24 @@ import Loader from "../Loader";
 
 const JoinedGroups = () => {
   const [joinedGroups, setJoinedGroups] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState();
 
   const getJoinedGroups = async () => {
+    setIsLoading(true);
     try {
       const groups = await GroupsAPI.getAll({ isJoined: true });
       setJoinedGroups(groups);
-      setLoading(false);
-    } catch (err) {
-      console.error("Error fetching joined groups:", err);
+    } catch (e) {
+      setError(e?.message || "Error fetching joined groups");
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
     getJoinedGroups();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  if (loading) {
-    return <Loader />;
-  }
 
   return (
     <>
@@ -34,11 +33,20 @@ const JoinedGroups = () => {
         My Groups
       </h3>
       <hr></hr>
-      <JoinedGroupsTable
-        joinedGroups={joinedGroups}
-        getJoinedGroups={getJoinedGroups}
-        setLoading={setLoading}
-      />
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <JoinedGroupsTable
+          joinedGroups={joinedGroups}
+          getJoinedGroups={getJoinedGroups}
+          setError={setError}
+        />
+      )}
     </>
   );
 };

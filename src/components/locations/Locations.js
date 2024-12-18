@@ -21,10 +21,10 @@ const Locations = () => {
       setLocations(res);
       setFilteredLocations(res);
       setIsLoading(false);
-    } catch (error) {
-      setError(error?.message || "Failed to find locations");
+    } catch (e) {
+      setError(e?.message || "Failed to find locations");
     }
-  }
+  };
 
   useEffect(() => {
     getLocations();
@@ -32,7 +32,7 @@ const Locations = () => {
 
   if (error) {
     return (
-      <div class="alert alert-danger" role="alert">
+      <div class="alert alert-danger container" role="alert">
         {error}
       </div>
     );
@@ -66,7 +66,9 @@ const Locations = () => {
           />
           {currentUser.isAdmin ? (
             <Link to="/locations/new">
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: "8px" }}
+              >
                 <Button color="warning" className="yellow-button">
                   Create Location
                 </Button>
@@ -74,7 +76,7 @@ const Locations = () => {
             </Link>
           ) : null}
         </div>
-      <LocationsTable locations={filteredLocations} />
+        <LocationsTable locations={filteredLocations} />
       </div>
     </div>
   );

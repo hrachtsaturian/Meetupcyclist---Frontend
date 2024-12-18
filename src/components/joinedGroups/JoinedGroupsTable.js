@@ -1,7 +1,7 @@
 import React from "react";
 import JoinedGroupCard from "./JoinedGroupCard";
 
-const JoinedGroupsTable = ({ joinedGroups, getJoinedGroups, setLoading }) => {
+const JoinedGroupsTable = ({ joinedGroups, getJoinedGroups, setError }) => {
   return (
     <div
       className="joinedGroups-table"
@@ -22,7 +22,7 @@ const JoinedGroupsTable = ({ joinedGroups, getJoinedGroups, setLoading }) => {
               key={i}
               joinedGroup={joinedGroup}
               getJoinedGroups={getJoinedGroups}
-              setLoading={setLoading}
+              setError={setError}
             />
           ))}
         </>

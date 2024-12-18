@@ -10,7 +10,8 @@ const Saves = () => {
   const [saves, setSaves] = useState([]);
   // selector by default - events
   const [selectedFilter, setSelectedFilter] = useState("events");
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState();
 
   const getSavesApiRequest = async () => {
     if (selectedFilter === "events") {
@@ -32,16 +33,15 @@ const Saves = () => {
   };
 
   const getSaves = async () => {
+    setIsLoading(true);
     try {
-      setLoading(true);
       const saves = await getSavesApiRequest();
       setSaves(saves);
-      setLoading(false);
-    } catch (err) {
-      console.error("Error fetching saved data:", err);
-      setSaves([]);
-      setLoading(false);
+    } catch (e) {
+      setError(e?.message || "Error fetching saved data");
+      setSaves([]); // override with empty array since we are changing the filter
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -83,14 +83,19 @@ const Saves = () => {
           </Button>
         </ButtonGroup>
       </div>
-      {loading ? (
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
+      {isLoading ? (
         <Loader />
       ) : (
         <SavesTable
           saves={saves}
           selectedFilter={selectedFilter}
           getSaves={getSaves}
-          setLoading={setLoading}
+          setError={setError}
         />
       )}
     </>
