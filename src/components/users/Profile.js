@@ -22,56 +22,47 @@ const Profile = () => {
   const [groups, setGroups] = useState(true);
   const [events, setEvents] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
   const navigate = useNavigate();
 
   const getUser = async () => {
-    try {
-      const res = await UsersAPI.get(id);
-      setUser(res);
-    } catch (error) {
-      setError(error?.message);
-    }
+    const res = await UsersAPI.get(id);
+    setUser(res);
   };
 
   const getUserEvents = async () => {
-    try {
-      const res = await EventsAPI.getAll({
-        filter: { createdBy: id, minDate: new Date() },
-      });
-      setEvents(res);
-    } catch (error) {
-      setError(error?.message);
-    }
+    const res = await EventsAPI.getAll({
+      filter: { createdBy: id, minDate: new Date() },
+    });
+    setEvents(res);
   };
 
   const getUserGroups = async () => {
-    try {
-      const res = await GroupsAPI.getAll({
-        createdBy: id,
-      });
-      setGroups(res);
-    } catch (error) {
-      setError(error?.message);
-    }
+    const res = await GroupsAPI.getAll({
+      createdBy: id,
+    });
+    setGroups(res);
   };
 
   const getData = async () => {
     try {
       await Promise.all([getUser(), getUserEvents(), getUserGroups()]);
       setIsLoading(false);
-    } catch (error) {
-      setError(error[0]?.message || "Failed to get user");
+    } catch (e) {
+      setError(e?.message || "Failed to get user");
     }
   };
 
   const handleDeactivate = async () => {
+    setIsSubmitting(true);
     try {
       const user = await UsersAPI.deactivate(id);
       setUser(user);
-    } catch (error) {
-      setError(error?.message);
+    } catch (e) {
+      setError(e?.message);
     }
+    setIsSubmitting(false);
   };
 
   useEffect(() => {
@@ -147,7 +138,7 @@ const Profile = () => {
                     <Button
                       color="danger"
                       className="yellow-button"
-                      disabled={user.deactivatedAt}
+                      disabled={user.deactivatedAt || isSubmitting}
                       onClick={() => {
                         showAlertOnDeactivate();
                       }}

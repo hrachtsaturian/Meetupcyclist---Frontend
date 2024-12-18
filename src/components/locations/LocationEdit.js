@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import LocationsAPI from "../../api/LocationsAPI";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, FormGroup, Label, Input, Button, Col } from "reactstrap";
+import LocationsAPI from "../../api/LocationsAPI";
 import Context from "../Context";
 import Loader from "../Loader";
 import { uploadImage } from "../../helpers/helpers";
@@ -13,7 +13,8 @@ const LocationEdit = () => {
   const [formData, setFormData] = useState({});
   const [isImageRemoved, setIsImageRemoved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [initializeError, setInitializeError] = useState();
   const [error, setError] = useState();
   const navigate = useNavigate();
 
@@ -21,19 +22,21 @@ const LocationEdit = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const { name, description, address, pfpUrl } = await LocationsAPI.get(id);
+        const { name, description, address, pfpUrl } = await LocationsAPI.get(
+          id
+        );
 
         setFormData({
           name,
           description,
           address,
-          pfpUrl
+          pfpUrl,
         });
         setIsLoading(false);
-      } catch (error) {
-        setError(error?.message);
+      } catch (e) {
+        setInitializeError(e?.message);
       }
-    }
+    };
 
     if (!currentUser.isAdmin) {
       return navigate("/");
@@ -52,14 +55,26 @@ const LocationEdit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
-      await LocationsAPI.update(id, { ...formData, pfpUrl: isImageRemoved ? '' : formData.pfpUrl });
+      await LocationsAPI.update(id, {
+        ...formData,
+        pfpUrl: isImageRemoved ? "" : formData.pfpUrl,
+      });
       navigate(`/locations/${id}`);
-    } catch (error) {
-      setError(error?.message || "Failed to update location");
-      setIsSuccess(false);
+    } catch (e) {
+      setError(e?.message || "Failed to update location");
     }
+    setIsSubmitting(false);
   };
+
+  if (initializeError) {
+    return (
+      <div class="alert alert-danger container" role="alert">
+        {initializeError}
+      </div>
+    );
+  }
 
   if (isLoading) {
     return <Loader />;
@@ -70,8 +85,13 @@ const LocationEdit = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <h3 style={{ fontSize: "40px" }} className="text-center mb-2 meetupcyclist">Location Update</h3>
+    <Form onSubmit={handleSubmit} className="container">
+      <h3
+        style={{ fontSize: "40px" }}
+        className="text-center mb-2 meetupcyclist"
+      >
+        Location Update
+      </h3>
       <hr></hr>
       <FormGroup row style={{ paddingTop: "40px" }}>
         <Label for="exampleName" sm={2}>
@@ -117,14 +137,12 @@ const LocationEdit = () => {
           />
         </Col>
         <Col sm={3}>
-          <FormGroup
-            check
-            inline
-          >
-            <Input type="checkbox" onChange={(e) => setIsImageRemoved(e.target.checked)} />
-            <Label check>
-              Remove Image
-            </Label>
+          <FormGroup check inline>
+            <Input
+              type="checkbox"
+              onChange={(e) => setIsImageRemoved(e.target.checked)}
+            />
+            <Label check>Remove Image</Label>
           </FormGroup>
         </Col>
       </FormGroup>
@@ -142,17 +160,22 @@ const LocationEdit = () => {
             onChange={handleChange}
           />
         </Col>
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-            <Button color="warning" className="yellow-button">
-              Save changes
-            </Button>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <Button
+            color="warning"
+            className="yellow-button"
+            disabled={isSubmitting}
+          >
+            Save changes
+          </Button>
         </div>
       </FormGroup>
-      {isSuccess && (
-        <div class="alert alert-success" role="alert">
-          Updated successfully
-        </div>
-      )}
       {error && (
         <div class="alert alert-danger" role="alert">
           {error}

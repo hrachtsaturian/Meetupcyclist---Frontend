@@ -48,7 +48,7 @@ const App = () => {
         const user = await UsersAPI.get(id);
         // store user in the state
         setCurrentUser(user);
-      } catch (error) {
+      } catch (e) {
         // if failed to initialize - ignore
         BaseAPI.token = null;
       }
@@ -79,7 +79,7 @@ const App = () => {
           <NavBar logout={logout} />
           {isInitializing && <Loader />}
           {!isInitializing && (
-            <div className="container">
+            <div>
               <Routes>
                 <Route
                   path="/"

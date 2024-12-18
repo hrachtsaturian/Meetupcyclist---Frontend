@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import EventsAPI from "../../api/EventsAPI";
 import { Link } from "react-router-dom";
 import {
@@ -12,16 +12,19 @@ import {
 import { formatDate } from "../../helpers/helpers";
 import EventIcon from "../../images/event_icon_default.png";
 
-const SaveEventCard = ({ event, getSaves, setLoading }) => {
+const SaveEventCard = ({ event, getSaves, setError }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleUnsave = async (e) => {
     e.preventDefault(); // Prevent navigation due to card link
-    setLoading(true);
+    setIsLoading(true);
     try {
       await EventsAPI.removeSave(event.id);
       await getSaves();
-    } catch (error) {
-      console.error("Error unsaving the event:", error);
+    } catch (e) {
+      setError(e?.message || "Error unsaving the event");
     }
+    setIsLoading(false);
   };
 
   return (
@@ -37,8 +40,8 @@ const SaveEventCard = ({ event, getSaves, setLoading }) => {
           src={event.pfpUrl || EventIcon}
           alt="event-main-photo"
           style={{
-            width: '200px',
-            height: '200px',
+            width: "200px",
+            height: "200px",
             objectFit: "contain",
           }}
         />
@@ -53,16 +56,23 @@ const SaveEventCard = ({ event, getSaves, setLoading }) => {
         <CardSubtitle>
           Organizer: {event.firstName} {event.lastName}
         </CardSubtitle>
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
-          {(
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "10px",
+          }}
+        >
+          {
             <Button
               color="warning"
               className="yellow-button"
+              disabled={isLoading}
               onClick={handleUnsave}
             >
               Unsave
             </Button>
-          )}
+          }
         </div>
       </CardBody>
     </Card>

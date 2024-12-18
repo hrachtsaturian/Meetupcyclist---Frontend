@@ -30,8 +30,8 @@ const HomePage = () => {
     try {
       await Promise.all([getUpcomingEvents(), getGroupPosts()]);
       setIsLoading(false);
-    } catch (error) {
-      setError(error[0]?.message || "Failed to get posts");
+    } catch (e) {
+      setError(e?.message || "Failed to get event/posts");
     }
   };
 
@@ -42,7 +42,7 @@ const HomePage = () => {
 
   if (error) {
     return (
-      <div class="alert alert-danger" role="alert">
+      <div class="alert alert-danger container" role="alert">
         {error}
       </div>
     );
@@ -70,7 +70,6 @@ const HomePage = () => {
         ) : (
           <PostsTable
             posts={posts}
-            getPosts={getGroupPosts}
             CardComponent={RecentPostCard}
           />
         )}
@@ -88,7 +87,6 @@ const HomePage = () => {
                 key={event.id}
                 event={event}
                 getEvents={getUpcomingEvents}
-                setIsLoading={setIsLoading}
               />
             ))}
           </div>

@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Form, FormGroup, Label, Input, Col, Button } from "reactstrap";
 import EventsAPI from "../../api/EventsAPI";
 import DatePicker from "react-datepicker";
 import Context from "../Context";
 import Loader from "../Loader";
-import { Form, FormGroup, Label, Input, Col, Button } from "reactstrap";
 import { uploadImage } from "../../helpers/helpers";
 
 const EventEdit = () => {
@@ -14,7 +14,8 @@ const EventEdit = () => {
   const [formData, setFormData] = useState({});
   const [isImageRemoved, setIsImageRemoved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [initializeError, setInitializeError] = useState();
   const [error, setError] = useState();
   const navigate = useNavigate();
 
@@ -34,13 +35,13 @@ const EventEdit = () => {
           description,
           date,
           location,
-          pfpUrl
+          pfpUrl,
         });
         setIsLoading(false);
-      } catch (error) {
-        setError(error?.message);
+      } catch (e) {
+        setInitializeError(e?.message);
       }
-    }
+    };
     if (id) {
       getData();
     }
@@ -54,31 +55,43 @@ const EventEdit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
-      await EventsAPI.update(id, { ...formData, pfpUrl: isImageRemoved ? '' : formData.pfpUrl });
+      await EventsAPI.update(id, {
+        ...formData,
+        pfpUrl: isImageRemoved ? "" : formData.pfpUrl,
+      });
       navigate(`/events/${id}`);
-    } catch (error) {
-      setError(error?.message || "Failed to update event");
-      setIsSuccess(false);
+    } catch (e) {
+      setError(e?.message || "Failed to update event");
     }
+    setIsSubmitting(false);
   };
 
   const handleUploadImage = async (e) => {
     await uploadImage(e, setFormData, setError);
   };
 
+  if (initializeError) {
+    return (
+      <div class="alert alert-danger container" role="alert">
+        {initializeError}
+      </div>
+    );
+  }
+
   if (isLoading) {
     return <Loader />;
   }
 
-  const maxTime = new Date();
-  maxTime.setHours(23);
-  maxTime.setMinutes(59);
-  maxTime.setSeconds(59);
-
   return (
-    <Form onSubmit={handleSubmit}>
-      <h3 style={{ fontSize: "40px" }} className="text-center mb-2 meetupcyclist">Event Update</h3>
+    <Form onSubmit={handleSubmit} className="container">
+      <h3
+        style={{ fontSize: "40px" }}
+        className="text-center mb-2 meetupcyclist"
+      >
+        Event Update
+      </h3>
       <hr></hr>
       <FormGroup row style={{ paddingTop: "40px" }}>
         <Label for="exampleTitle" sm={2}>
@@ -124,14 +137,12 @@ const EventEdit = () => {
           />
         </Col>
         <Col sm={3}>
-          <FormGroup
-            check
-            inline
-          >
-            <Input type="checkbox" onChange={(e) => setIsImageRemoved(e.target.checked)} />
-            <Label check>
-              Remove Image
-            </Label>
+          <FormGroup check inline>
+            <Input
+              type="checkbox"
+              onChange={(e) => setIsImageRemoved(e.target.checked)}
+            />
+            <Label check>Remove Image</Label>
           </FormGroup>
         </Col>
       </FormGroup>
@@ -169,17 +180,22 @@ const EventEdit = () => {
             timeIntervals={15}
           />
         </Col>
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-            <Button color="warning" className="yellow-button">
-              Save changes
-            </Button>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <Button
+            color="warning"
+            className="yellow-button"
+            disabled={isSubmitting}
+          >
+            Save changes
+          </Button>
         </div>
       </FormGroup>
-      {isSuccess && (
-        <div class="alert alert-success" role="alert">
-          Updated successfully
-        </div>
-      )}
       {error && (
         <div class="alert alert-danger" role="alert">
           {error}

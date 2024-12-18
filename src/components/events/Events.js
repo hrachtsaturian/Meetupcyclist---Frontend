@@ -4,7 +4,7 @@ import EventsTable from "./EventsTable";
 import SearchBar from "../SearchBar";
 import Loader from "../Loader";
 import { Link } from "react-router-dom";
-import { Button, Col } from "reactstrap";
+import { Button} from "reactstrap";
 
 const Events = () => {
   const [events, setEvents] = useState([]);
@@ -18,10 +18,10 @@ const Events = () => {
       setEvents(res);
       setFilteredEvents(res);
       setIsLoading(false);
-    } catch (error) {
-      setError(error?.message || "Failed to find events");
+    } catch (e) {
+      setError(e?.message || "Failed to find events");
     }
-  }
+  };
 
   useEffect(() => {
     getEvents();
@@ -29,7 +29,7 @@ const Events = () => {
 
   if (error) {
     return (
-      <div class="alert alert-danger" role="alert">
+      <div class="alert alert-danger container" role="alert">
         {error}
       </div>
     );
@@ -48,7 +48,13 @@ const Events = () => {
         >
           Events
         </h3>
-        <div style={{ display: "flex", gap: '40px', justifyContent: 'space-between' }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "20px",
+            justifyContent: "space-between",
+          }}
+        >
           <SearchBar
             data={events}
             searchField="title"
@@ -56,11 +62,11 @@ const Events = () => {
             onSearchResults={setFilteredEvents}
           />
           <Link to="/events/new">
-            <Col>
+            <div>
               <Button color="warning" className="yellow-button">
                 Create Event
               </Button>
-            </Col>
+            </div>
           </Link>
         </div>
         <EventsTable events={filteredEvents} />

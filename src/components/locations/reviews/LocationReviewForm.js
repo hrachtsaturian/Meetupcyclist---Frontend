@@ -3,6 +3,7 @@ import { Button, Form, FormGroup, Input, Label } from "reactstrap";
 import LocationReviewRating from "./LocationReviewRating";
 
 const LocationReviewForm = ({
+  isSubmitting,
   newReviewRate,
   newReviewText,
   setNewReviewText,
@@ -37,8 +38,7 @@ const LocationReviewForm = ({
             <Button
               color="warning"
               className="yellow-button"
-              // !0
-              disabled={!newReviewText?.trim() || !newReviewRate}
+              disabled={!newReviewText?.trim() || !newReviewRate || isSubmitting}
             >
               Submit
             </Button>

@@ -23,7 +23,9 @@ const GroupPostCard = ({ post, getPosts }) => {
   const { currentUser } = useContext(Context);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [postText, setPostText] = useState(post.text);
+  const [error, setError] = useState();
 
   const toggleEditMode = () => {
     setIsEditing(!isEditing);
@@ -31,21 +33,23 @@ const GroupPostCard = ({ post, getPosts }) => {
 
   const handleSubmitEdit = async (e) => {
     e.preventDefault(); // Prevent navigation due to card link
+    setIsSubmitting(true);
     try {
       await GroupsAPI.editPost(post.id, postText);
       await getPosts();
       setIsEditing(false);
-    } catch (error) {
-      console.error("Error editing the post:", error);
+    } catch (e) {
+      setError(e?.message || "Error editing the post");
     }
+    setIsSubmitting(false);
   };
 
   const handleDelete = async () => {
     try {
       await GroupsAPI.deletePost(post.id);
       await getPosts();
-    } catch (error) {
-      console.error("Error deleting the post:", error);
+    } catch (e) {
+      setError(e?.message || "Error deleting the post");
     }
   };
 
@@ -66,7 +70,7 @@ const GroupPostCard = ({ post, getPosts }) => {
               <Button
                 color="warning"
                 className="yellow-button"
-                disabled={!postText?.trim()}
+                disabled={!postText?.trim() || isSubmitting}
               >
                 Submit
               </Button>
@@ -78,17 +82,22 @@ const GroupPostCard = ({ post, getPosts }) => {
   };
 
   const userFullName = `${post.firstName} ${post.lastName}`;
-  const displayName = post.userId === post.groupAdmin ? `${userFullName} (Group Admin)` : userFullName;
+  const displayName =
+    post.userId === post.groupAdmin
+      ? `${userFullName} (Group Admin)`
+      : userFullName;
   const displayText = isEditing ? showInput() : post.text;
-  const displayDate = `${formatDate(post.createdAt)}${post.updatedAt ? " (edited)" : ""}`;
+  const displayDate = `${formatDate(post.createdAt)}${
+    post.updatedAt ? " (edited)" : ""
+  }`;
 
   return (
-    <Card className="my-2">
-      <div style={{ display: "flex", width: "600px" }}>
+    <Card className="my-2" style={{ width: "600px" }}>
+      <div style={{ display: "flex" }}>
         <Link
           to={`/users/${post.userId}`}
           style={{
-            padding: "8px ",
+            padding: "8px",
           }}
         >
           <img
@@ -103,10 +112,7 @@ const GroupPostCard = ({ post, getPosts }) => {
               border: "2px solid #ccc",
             }}
           />
-          <UncontrolledTooltip
-            placement="top"
-            target={`user-${post.id}`}
-          >
+          <UncontrolledTooltip placement="top" target={`user-${post.id}`}>
             {post.firstName} {post.lastName}
           </UncontrolledTooltip>
         </Link>
@@ -118,47 +124,58 @@ const GroupPostCard = ({ post, getPosts }) => {
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <CardText className="fs-6 text-muted">{displayDate}</CardText>
             <div style={{ display: "flex", gap: "8px" }}>
-            {currentUser.id === post.userId && (
-              <div
-                id={`editPostIcon-${post.id}`}
-                className="icon-wrapper"
-                style={{
-                  cursor: "pointer",
-                  display: "inline-block",
-                }}
-                onClick={toggleEditMode}
-              >
-                <FontAwesomeIcon icon={faPenToSquare} className="fa-xl" />
-                <UncontrolledTooltip
-                  placement="top"
-                  target={`editPostIcon-${post.id}`}
+              {currentUser.id === post.userId && (
+                <div
+                  id={`editPostIcon-${post.id}`}
+                  className="icon-wrapper"
+                  style={{
+                    cursor: "pointer",
+                    display: "inline-block",
+                  }}
+                  onClick={toggleEditMode}
                 >
-                  Edit
-                </UncontrolledTooltip>
-              </div>
-            )}
-            {/* either createdBy, or isAdmin, or group creator can delete */}
-            {(currentUser.id === post.userId || currentUser.isAdmin || currentUser.id === post.createdBy) && (
-              <div
-                id={`deletePostIcon-${post.id}`}
-                className="icon-wrapper"
-                style={{
-                  cursor: "pointer",
-                  display: "inline-block",
-                }}
-                onClick={handleDelete}
-              >
-                <FontAwesomeIcon icon={faTrash} className="fa-xl" />
-                <UncontrolledTooltip
-                  placement="top"
-                  target={`deletePostIcon-${post.id}`}
+                  <FontAwesomeIcon icon={faPenToSquare} className="fa-xl" />
+                  <UncontrolledTooltip
+                    placement="top"
+                    target={`editPostIcon-${post.id}`}
+                  >
+                    Edit
+                  </UncontrolledTooltip>
+                </div>
+              )}
+              {/* either createdBy, or isAdmin, or group creator can delete */}
+              {(currentUser.id === post.userId ||
+                currentUser.isAdmin ||
+                currentUser.id === post.createdBy) && (
+                <div
+                  id={`deletePostIcon-${post.id}`}
+                  className="icon-wrapper"
+                  style={{
+                    cursor: "pointer",
+                    display: "inline-block",
+                  }}
+                  onClick={handleDelete}
                 >
-                  Delete
-                </UncontrolledTooltip>
-              </div>
-            )}
+                  <FontAwesomeIcon icon={faTrash} className="fa-xl" />
+                  <UncontrolledTooltip
+                    placement="top"
+                    target={`deletePostIcon-${post.id}`}
+                  >
+                    Delete
+                  </UncontrolledTooltip>
+                </div>
+              )}
+            </div>
           </div>
-          </div>
+          {error && (
+            <div
+              className="alert alert-danger"
+              role="alert"
+              style={{ marginTop: "10px" }}
+            >
+              {error}
+            </div>
+          )}
         </CardBody>
       </div>
     </Card>

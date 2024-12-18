@@ -26,7 +26,7 @@ class EventsAPI extends BaseAPI {
       isAttending = null,
       minDate = null,
       maxDate = null,
-      createdBy = null
+      createdBy = null,
     } = {},
     sort: { date = "ASC" } = {},
   } = {}) {
@@ -71,7 +71,7 @@ class EventsAPI extends BaseAPI {
     const res = await this.request({
       path: `events/${id}/posts`,
       method: "post",
-      data: { text: newPostText }
+      data: { text: newPostText },
     });
     return res.data;
   }
@@ -81,7 +81,7 @@ class EventsAPI extends BaseAPI {
     const res = await this.request({
       path: `eventposts/${id}`,
       method: "patch",
-      data: { text: newPostText }
+      data: { text: newPostText },
     });
     return res.data;
   }

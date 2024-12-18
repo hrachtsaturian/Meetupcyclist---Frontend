@@ -13,6 +13,7 @@ const Signup = ({ login }) => {
     pfpUrl: "",
     bio: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
   const navigate = useNavigate();
 
@@ -23,15 +24,15 @@ const Signup = ({ login }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
-      // issue with creating user - firstName, lastName, email, and password are missing
       const token = await UsersAPI.signup(formData);
       login(token);
       navigate("/");
-    } catch (error) {
-      console.log(error);
-      setError(error?.message || "Failed to sign up");
+    } catch (e) {
+      setError(e?.message || "Failed to sign up");
     }
+    setIsSubmitting(false);
   };
 
   const handleUploadImage = async (e) => {
@@ -41,7 +42,12 @@ const Signup = ({ login }) => {
   return (
     <div className="signupPage">
       <Form onSubmit={handleSubmit} className="signupForm">
-        <h3 style={{fontSize: "40px" }}className="text-center mb-2 meetupcyclist">Sign Up</h3>
+        <h3
+          style={{ fontSize: "40px" }}
+          className="text-center mb-2 meetupcyclist"
+        >
+          Sign Up
+        </h3>
         <FormGroup row>
           <Label for="exampleFirstName" sm={2}>
             First Name
@@ -102,14 +108,14 @@ const Signup = ({ login }) => {
           <Label for="examplePfpUrl" sm={2}>
             Profile Photo
           </Label>
-        <Col sm={10}>
-          <Input
-            id="imageFile"
-            name="imageFile"
-            type="file"
-            onChange={handleUploadImage}
-          />
-        </Col>
+          <Col sm={10}>
+            <Input
+              id="imageFile"
+              name="imageFile"
+              type="file"
+              onChange={handleUploadImage}
+            />
+          </Col>
         </FormGroup>
         <FormGroup row>
           <Label for="exampleText" sm={2}>
@@ -128,12 +134,22 @@ const Signup = ({ login }) => {
         <FormGroup check row>
           <Col sm={11}>
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <Button color="warning" className="yellow-button">Submit</Button>
+              <Button
+                color="warning"
+                className="yellow-button"
+                disabled={isSubmitting}
+              >
+                Submit
+              </Button>
             </div>
           </Col>
         </FormGroup>
         {error && (
-          <div className="alert alert-danger" role="alert">
+          <div
+            className="alert alert-danger"
+            role="alert"
+            style={{ marginTop: "10px" }}
+          >
             {error}
           </div>
         )}

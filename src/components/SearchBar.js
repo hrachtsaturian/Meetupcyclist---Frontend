@@ -5,11 +5,13 @@ const SearchBar = ({ data, searchField, placeholder, onSearchResults }) => {
   const [query, setQuery] = useState("");
 
   const handleSearch = (e) => {
+    setQuery(e.target.value);
     const searchTerm = e.target.value.toLowerCase();
-    setQuery(searchTerm);
 
-    const results = data.filter((item) =>
-      item[searchField]?.toLowerCase()?.includes(searchTerm)
+    const results = data.filter(
+      (item) =>
+        item[searchField]?.toLowerCase()?.includes(searchTerm) ||
+        item?.address?.toLowerCase?.()?.includes(searchTerm)
     );
     onSearchResults(results);
   };

@@ -1,11 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-  Card,
-  CardBody,
-  CardSubtitle,
-  CardTitle,
-} from "reactstrap";
+import { Card, CardBody, CardSubtitle, CardTitle } from "reactstrap";
 import GroupIcon from "../../images/group_icon_default.png";
 
 const UserGroupCard = ({ group }) => {
@@ -22,9 +17,9 @@ const UserGroupCard = ({ group }) => {
           alt="group-main-photo"
           src={group.pfpUrl || GroupIcon}
           style={{
-            width: '100px',
-            height: '100px',
-            objectFit: 'contain'
+            width: "100px",
+            height: "100px",
+            objectFit: "contain",
           }}
         />
         <CardBody>

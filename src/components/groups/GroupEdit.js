@@ -13,7 +13,8 @@ const GroupEdit = () => {
   const [formData, setFormData] = useState({});
   const [isImageRemoved, setIsImageRemoved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [initializeError, setInitializeError] = useState();
   const [error, setError] = useState();
   const navigate = useNavigate();
 
@@ -21,7 +22,9 @@ const GroupEdit = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const { name, description, pfpUrl, createdBy } = await GroupsAPI.get(id);
+        const { name, description, pfpUrl, createdBy } = await GroupsAPI.get(
+          id
+        );
 
         if (currentUser.id !== createdBy && !currentUser.isAdmin) {
           navigate("/");
@@ -30,13 +33,13 @@ const GroupEdit = () => {
         setFormData({
           name,
           description,
-          pfpUrl
+          pfpUrl,
         });
         setIsLoading(false);
-      } catch (error) {
-        setError(error?.message);
+      } catch (e) {
+        setInitializeError(e?.message);
       }
-    }
+    };
     if (id) {
       getData();
     }
@@ -50,26 +53,43 @@ const GroupEdit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
-      await GroupsAPI.update(id, { ...formData, pfpUrl: isImageRemoved ? '' : formData.pfpUrl });
+      await GroupsAPI.update(id, {
+        ...formData,
+        pfpUrl: isImageRemoved ? "" : formData.pfpUrl,
+      });
       navigate(`/groups/${id}`);
-    } catch (error) {
-      setError(error?.message || "Failed to update group");
-      setIsSuccess(false);
+    } catch (e) {
+      setError(e?.message || "Failed to update group");
     }
+    setIsSubmitting(false);
   };
 
   const handleUploadImage = async (e) => {
     await uploadImage(e, setFormData, setError);
   };
 
+  if (initializeError) {
+    return (
+      <div class="alert alert-danger container" role="alert">
+        {initializeError}
+      </div>
+    );
+  }
+
   if (isLoading) {
     return <Loader />;
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <h3 style={{ fontSize: "40px" }} className="text-center mb-2 meetupcyclist">Group Update</h3>
+    <Form onSubmit={handleSubmit} className="container">
+      <h3
+        style={{ fontSize: "40px" }}
+        className="text-center mb-2 meetupcyclist"
+      >
+        Group Update
+      </h3>
       <hr></hr>
       <FormGroup row style={{ paddingTop: "40px" }}>
         <Label for="exampleName" sm={2}>
@@ -115,27 +135,30 @@ const GroupEdit = () => {
           />
         </Col>
         <Col sm={3}>
-          <FormGroup
-            check
-            inline
-          >
-            <Input type="checkbox" onChange={(e) => setIsImageRemoved(e.target.checked)} />
-            <Label check>
-              Remove Image
-            </Label>
+          <FormGroup check inline>
+            <Input
+              type="checkbox"
+              onChange={(e) => setIsImageRemoved(e.target.checked)}
+            />
+            <Label check>Remove Image</Label>
           </FormGroup>
         </Col>
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-            <Button color="warning" className="yellow-button">
-              Save changes
-            </Button>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <Button
+            color="warning"
+            className="yellow-button"
+            disabled={isSubmitting}
+          >
+            Save changes
+          </Button>
         </div>
       </FormGroup>
-      {isSuccess && (
-        <div class="alert alert-success" role="alert">
-          Updated successfully
-        </div>
-      )}
       {error && (
         <div class="alert alert-danger" role="alert">
           {error}

@@ -16,27 +16,37 @@ import LocationIcon from "../../images/location_icon_default.png";
 
 const LocationRow = ({ location }) => {
   const [isSaved, setIsSaved] = useState(location.isSaved);
+  const [error, setError] = useState(null);
 
-  // do we need loading state to prevent double click?
   const toggleSave = async () => {
-    if (isSaved) {
-      await LocationsAPI.removeSave(location.id); // Unsave the location
-      setIsSaved(false);
-    } else {
-      await LocationsAPI.makeSave(location.id); // Save the location
-      setIsSaved(true);
+    try {
+      if (isSaved) {
+        setIsSaved(false); // optimistic update
+        await LocationsAPI.removeSave(location.id); // Unsave the location
+      } else {
+        setIsSaved(true);
+        await LocationsAPI.makeSave(location.id); // Save the location
+      }
+    } catch (e) {
+      setError(e?.message || "Failed to save/unsave location");
+      setIsSaved((prev) => !prev); // revert
     }
   };
 
   return (
-    <Card className="my-2" tag={Link} to={`/locations/${location.id}`}>
-      <div style={{ display: "flex", width: "700px" }}>
+    <Card
+      className="my-2"
+      tag={Link}
+      to={`/locations/${location.id}`}
+      style={{ width: "700px" }}
+    >
+      <div style={{ display: "flex" }}>
         <CardImg
           alt="location-main-photo"
           src={location.pfpUrl || LocationIcon}
           style={{
             width: "200px",
-            height: '200px',
+            height: "200px",
             objectFit: "contain",
           }}
         />
@@ -74,6 +84,15 @@ const LocationRow = ({ location }) => {
               {isSaved ? "Unsave" : "Save"}
             </UncontrolledTooltip>
           </div>
+          {error && (
+            <div
+              className="alert alert-danger"
+              role="alert"
+              style={{ marginBottom: "20px" }}
+            >
+              {error}
+            </div>
+          )}
         </CardBody>
       </div>
     </Card>

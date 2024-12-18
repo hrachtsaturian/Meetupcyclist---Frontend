@@ -45,6 +45,7 @@ const Event = () => {
   const [posts, setPosts] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmittingPost, setIsSubmittingPost] = useState(false);
   const [error, setError] = useState();
   const [isAttending, setIsAttending] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -72,8 +73,8 @@ const Event = () => {
     try {
       await Promise.all([getEvent(), getEventAttendees(), getEventPosts()]);
       setIsLoading(false);
-    } catch (error) {
-      setError(error[0]?.message || "Failed to get event");
+    } catch (e) {
+      setError(e?.message || "Failed to get event");
     }
   };
 
@@ -81,48 +82,52 @@ const Event = () => {
     try {
       await EventsAPI.delete(id);
       navigate("/events");
-    } catch (error) {
-      setError("Failed to delete the event");
+    } catch (e) {
+      setError(e?.message || "Failed to delete the event");
     }
   };
 
   const handleCreatePost = async (e) => {
     e.preventDefault();
+    setIsSubmittingPost(true);
     try {
       await EventsAPI.createPost(id, newPostText);
       await getEventPosts();
       setNewPostText("");
-    } catch (error) {
-      setError("Failed to create new post");
+    } catch (e) {
+      setError(e?.message || "Failed to create new post");
     }
+    setIsSubmittingPost(false);
   };
 
   const toggleAttendance = async () => {
     try {
       if (isAttending) {
+        setIsAttending(false); // optimistic update
         await EventsAPI.unattend(id); // Unattend the event
-        setIsAttending(false);
       } else {
-        await EventsAPI.attend(id); // Attend the event
         setIsAttending(true);
+        await EventsAPI.attend(id); // Attend the event
       }
       await getEventAttendees();
-    } catch (error) {
-      setError(error?.message);
+    } catch (e) {
+      setError(e?.message);
+      setIsAttending((prev) => !prev); // revert
     }
   };
 
   const toggleSave = async () => {
     try {
       if (isSaved) {
+        setIsSaved(false); // optimistic update
         await EventsAPI.removeSave(id); // Unsave the event
-        setIsSaved(false);
       } else {
-        await EventsAPI.makeSave(id); // Save the event
         setIsSaved(true);
+        await EventsAPI.makeSave(id); // Save the event
       }
-    } catch (error) {
-      setError(error?.message);
+    } catch (e) {
+      setError(e?.message);
+      setIsSaved((prev) => !prev); // revert
     }
   };
 
@@ -143,7 +148,7 @@ const Event = () => {
 
   if (error) {
     return (
-      <div class="alert alert-danger" role="alert">
+      <div class="alert alert-danger container" role="alert">
         {error || "Failed to find event info"}
       </div>
     );
@@ -319,6 +324,7 @@ const Event = () => {
                 })}
               </div>
             </div>
+            
             {/* Maps Section */}
             <Row className="mt-4">
               <MapFrame location={event.location} />
@@ -346,7 +352,7 @@ const Event = () => {
                       <Button
                         color="warning"
                         className="yellow-button"
-                        disabled={!newPostText?.trim()}
+                        disabled={!newPostText?.trim() || isSubmittingPost}
                       >
                         Submit
                       </Button>

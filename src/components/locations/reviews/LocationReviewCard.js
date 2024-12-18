@@ -24,8 +24,10 @@ const LocationReviewCard = ({ locationReview, getReviews }) => {
   const { currentUser } = useContext(Context);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [reviewText, setReviewText] = useState(locationReview.text);
   const [reviewRate, setReviewRate] = useState(locationReview.rate);
+  const [error, setError] = useState();
 
   const toggleEditMode = () => {
     setIsEditing(!isEditing);
@@ -33,21 +35,23 @@ const LocationReviewCard = ({ locationReview, getReviews }) => {
 
   const handleSubmitEdit = async (e) => {
     e.preventDefault(); // Prevent navigation due to card link
+    setIsSubmitting(true);
     try {
       await LocationsAPI.editReview(locationReview.id, reviewText, reviewRate);
       await getReviews();
       setIsEditing(false);
-    } catch (error) {
-      console.error("Error editing the review:", error);
+    } catch (e) {
+      setError(e?.message || "Error editing the review");
     }
+    setIsSubmitting(false);
   };
 
   const handleDelete = async () => {
     try {
       await LocationsAPI.deleteReview(locationReview.id);
       await getReviews();
-    } catch (error) {
-      console.error("Error deleting the review:", error);
+    } catch (e) {
+      setError(e?.message || "Error deleting the review");
     }
   };
 
@@ -75,7 +79,7 @@ const LocationReviewCard = ({ locationReview, getReviews }) => {
               <Button
                 color="warning"
                 className="yellow-button"
-                disabled={!reviewText?.trim()}
+                disabled={!reviewText?.trim() || isSubmitting}
               >
                 Submit
               </Button>
@@ -92,12 +96,13 @@ const LocationReviewCard = ({ locationReview, getReviews }) => {
       ? `${userFullName} (Admin)`
       : userFullName;
   const displayText = isEditing ? showInput() : locationReview.text;
-  const displayDate = `${formatDate(locationReview.createdAt)}${locationReview.updatedAt ? " (edited)" : ""
-    }`;
+  const displayDate = `${formatDate(locationReview.createdAt)}${
+    locationReview.updatedAt ? " (edited)" : ""
+  }`;
 
   return (
-    <Card className="my-2">
-      <div style={{ display: "flex", width: "600px" }}>
+    <Card className="my-2" style={{ width: "600px" }}>
+      <div style={{ display: "flex" }}>
         <Link
           to={`/users/${locationReview.userId}`}
           style={{
@@ -159,26 +164,31 @@ const LocationReviewCard = ({ locationReview, getReviews }) => {
               {/* either createdBy or isAdmin can delete */}
               {(currentUser.id === locationReview.userId ||
                 currentUser.isAdmin) && (
-                  <div
-                    id={`deleteReviewIcon-${locationReview.id}`}
-                    className="icon-wrapper"
-                    style={{
-                      cursor: "pointer",
-                      display: "inline-block",
-                    }}
-                    onClick={handleDelete}
+                <div
+                  id={`deleteReviewIcon-${locationReview.id}`}
+                  className="icon-wrapper"
+                  style={{
+                    cursor: "pointer",
+                    display: "inline-block",
+                  }}
+                  onClick={handleDelete}
+                >
+                  <FontAwesomeIcon icon={faTrash} className="fa-xl" />
+                  <UncontrolledTooltip
+                    placement="top"
+                    target={`deleteReviewIcon-${locationReview.id}`}
                   >
-                    <FontAwesomeIcon icon={faTrash} className="fa-xl" />
-                    <UncontrolledTooltip
-                      placement="top"
-                      target={`deleteReviewIcon-${locationReview.id}`}
-                    >
-                      Delete
-                    </UncontrolledTooltip>
-                  </div>
-                )}
+                    Delete
+                  </UncontrolledTooltip>
+                </div>
+              )}
             </div>
           </div>
+          {error && (
+            <div className="alert alert-danger" role="alert">
+              {error}
+            </div>
+          )}
         </CardBody>
       </div>
     </Card>

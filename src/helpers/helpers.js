@@ -14,13 +14,13 @@ export const formatDate = (date) => {
 export const formatDateMY = (date) => {
   return new Date(date).toLocaleString("en-US", {
     month: "long",
-    year: "numeric"
-  })
-}
+    year: "numeric",
+  });
+};
 
 export const isPastEvent = (event) => {
   return new Date(event.date) < new Date();
-}
+};
 
 export const uploadImage = async (event, setFormData, setError) => {
   const imageForm = new FormData();
@@ -32,8 +32,8 @@ export const uploadImage = async (event, setFormData, setError) => {
     }
     const imageUrl = await ImagesAPI.uploadImage(imageForm);
     setFormData((formData) => ({ ...formData, pfpUrl: imageUrl }));
-  } catch (error) {
-    setError(error?.message || "Failed to upload image");
+  } catch (e) {
+    setError(e?.message || "Failed to upload image");
   }
 };
 

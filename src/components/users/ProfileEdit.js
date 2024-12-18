@@ -10,7 +10,7 @@ const ProfileEdit = () => {
 
   const [formData, setFormData] = useState({});
   const [isImageRemoved, setIsImageRemoved] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
   const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ const ProfileEdit = () => {
       email,
       password,
       pfpUrl,
-      bio
+      bio,
     });
   }, [currentUser]);
 
@@ -33,17 +33,18 @@ const ProfileEdit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
-      const updatedUser = await UsersAPI.updateProfile(
-        currentUser.id,
-        { ...formData, pfpUrl: isImageRemoved ? '' : formData.pfpUrl }
-      );
+      const updatedUser = await UsersAPI.updateProfile(currentUser.id, {
+        ...formData,
+        pfpUrl: isImageRemoved ? "" : formData.pfpUrl,
+      });
       setCurrentUser(updatedUser);
       navigate(`/users/${currentUser.id}`);
-    } catch (error) {
-      setError(error?.message || 'Failed to update profile');
-      setIsSuccess(false);
+    } catch (e) {
+      setError(e?.message || "Failed to update profile");
     }
+    setIsSubmitting(false);
   };
 
   const handleUploadImage = async (e) => {
@@ -51,8 +52,13 @@ const ProfileEdit = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <h3 style={{ fontSize: "40px" }} className="text-center mb-2 meetupcyclist">Profile Update</h3>
+    <Form onSubmit={handleSubmit} className="container">
+      <h3
+        style={{ fontSize: "40px" }}
+        className="text-center mb-2 meetupcyclist"
+      >
+        Profile Update
+      </h3>
       <hr></hr>
       <FormGroup row style={{ paddingTop: "40px" }}>
         <Label for="exampleFirstName" sm={2}>
@@ -128,14 +134,12 @@ const ProfileEdit = () => {
           />
         </Col>
         <Col sm={3}>
-          <FormGroup
-            check
-            inline
-          >
-            <Input type="checkbox" onChange={(e) => setIsImageRemoved(e.target.checked)} />
-            <Label check>
-              Remove Image
-            </Label>
+          <FormGroup check inline>
+            <Input
+              type="checkbox"
+              onChange={(e) => setIsImageRemoved(e.target.checked)}
+            />
+            <Label check>Remove Image</Label>
           </FormGroup>
         </Col>
       </FormGroup>
@@ -153,17 +157,22 @@ const ProfileEdit = () => {
             onChange={handleChange}
           />
         </Col>
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-            <Button color="warning" className="yellow-button">
-              Save changes
-            </Button>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <Button
+            color="warning"
+            className="yellow-button"
+            disabled={isSubmitting}
+          >
+            Save changes
+          </Button>
         </div>
       </FormGroup>
-      {isSuccess && (
-        <div class="alert alert-success" role="alert">
-          Updated successfully
-        </div>
-      )}
       {error && (
         <div class="alert alert-danger" role="alert">
           {error}
