@@ -5,7 +5,7 @@ import LogoBig from "../../images/logo_big.png";
 
 const WelcomePage = () => {
   return (
-    <div className="nonLoggedInPage">
+    <div className="nonLoggedInPage" data-testid="welcome-page">
       <div className="leftSide">
         <img src={LogoBig} alt="logo" />
       </div>

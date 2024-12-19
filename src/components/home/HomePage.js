@@ -53,7 +53,10 @@ const HomePage = () => {
   }
 
   return (
-    <Row style={{ gap: "32px", justifyContent: "center" }}>
+    <Row
+      style={{ gap: "32px", justifyContent: "center" }}
+      data-testid="home-page"
+    >
       <Col sm="5">
         <CardTitle className="fs-4" style={{ marginBottom: "16px" }}>
           Recent Activity
@@ -68,10 +71,7 @@ const HomePage = () => {
             </Link>
           </>
         ) : (
-          <PostsTable
-            posts={posts}
-            CardComponent={RecentPostCard}
-          />
+          <PostsTable posts={posts} CardComponent={RecentPostCard} />
         )}
       </Col>
       <Col sm="5">
