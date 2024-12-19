@@ -23,7 +23,7 @@ import { Link, useLocation } from "react-router-dom";
 import Context from "./Context";
 import Logo from "../images/logo.png";
 
-const NavBar = ({ logout = () => {} }) => {
+const NavBar = ({ isInitializing, logout = () => {} }) => {
   const { currentUser } = useContext(Context);
 
   const location = useLocation();
@@ -292,7 +292,7 @@ const NavBar = ({ logout = () => {} }) => {
   };
 
   // Compact nav menu on narrow screen
-  const getNaNarrow = () => {
+  const getNavNarrow = () => {
     if (currentUser) {
       return loggedInUserNavItemsNarrow();
     } else {
@@ -316,9 +316,15 @@ const NavBar = ({ logout = () => {} }) => {
         </NavbarBrand>
         <div>
           <Nav className="me-auto" navbar>
-            <div className="nav-container-full-screen">{getNavFull()}</div>
-            {/* Compact nav menu on narrow screen */}
-            <div className="nav-container-narrow-screen">{getNaNarrow()}</div>
+            {!isInitializing && (
+              <>
+                <div className="nav-container-full-screen">{getNavFull()}</div>
+                {/* Compact nav menu on narrow screen */}
+                <div className="nav-container-narrow-screen">
+                  {getNavNarrow()}
+                </div>
+              </>
+            )}
           </Nav>
         </div>
       </Navbar>

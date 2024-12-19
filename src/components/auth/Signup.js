@@ -4,7 +4,7 @@ import UsersAPI from "../../api/UsersAPI";
 import { Form, Button, Col, FormGroup, Input, Label } from "reactstrap";
 import { uploadImage } from "../../helpers/helpers";
 
-const Signup = ({ login }) => {
+const Signup = ({ onAuthSuccess }) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -26,8 +26,8 @@ const Signup = ({ login }) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const token = await UsersAPI.signup(formData);
-      login(token);
+      const { user, token } = await UsersAPI.signup(formData);
+      onAuthSuccess(user, token);
       navigate("/");
     } catch (e) {
       setError(e?.message || "Failed to sign up");
@@ -58,6 +58,7 @@ const Signup = ({ login }) => {
               name="firstName"
               placeholder="John"
               type="text"
+              value={formData.firstName}
               onChange={handleChange}
             />
           </Col>
@@ -72,6 +73,7 @@ const Signup = ({ login }) => {
               name="lastName"
               placeholder="Doe"
               type="text"
+              value={formData.lastName}
               onChange={handleChange}
             />
           </Col>
@@ -86,6 +88,7 @@ const Signup = ({ login }) => {
               name="email"
               placeholder="example@email.com"
               type="email"
+              value={formData.email}
               onChange={handleChange}
             />
           </Col>
@@ -100,6 +103,7 @@ const Signup = ({ login }) => {
               name="password"
               placeholder="********"
               type="password"
+              value={formData.password}
               onChange={handleChange}
             />
           </Col>
@@ -127,6 +131,7 @@ const Signup = ({ login }) => {
               name="bio"
               type="textarea"
               placeholder="Tell us a little about yourself..."
+              value={formData.bio}
               onChange={handleChange}
             />
           </Col>

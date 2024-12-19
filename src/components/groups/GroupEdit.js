@@ -138,6 +138,7 @@ const GroupEdit = () => {
           <FormGroup check inline>
             <Input
               type="checkbox"
+              checked={isImageRemoved}
               onChange={(e) => setIsImageRemoved(e.target.checked)}
             />
             <Label check>Remove Image</Label>

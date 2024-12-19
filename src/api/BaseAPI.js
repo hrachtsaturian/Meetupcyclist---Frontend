@@ -10,8 +10,6 @@ class BaseAPI {
   static token;
 
   static async request({ path, data = {}, method = "get" }) {
-    console.debug("API Call:", path, data, method);
-
     const url = `${BASE_URL}/${path}`;
     const params = method === "get" ? data : {};
     const headers = {};
@@ -21,13 +19,29 @@ class BaseAPI {
     }
 
     try {
-      return (await axios({ url, method, data, params, headers })).data;
+      const axiosRes = await axios({
+        url,
+        method,
+        data,
+        params,
+        headers,
+        withCredentials: true,
+      });
+      if (axiosRes.data.redirect) {
+        if (
+          window.location.pathname !== axiosRes.data.redirect &&
+          window.location.pathname !== "/signup" &&
+          window.location.pathname !== "/login"
+        ) {
+          window.location.href = axiosRes.data.redirect;
+        }
+        return {};
+      }
+      return axiosRes.data;
     } catch (e) {
       console.error("API Error:", e?.response);
       const message =
-        e?.response?.data?.error?.message ||
-        e.message ||
-        "Unexpected error";
+        e?.response?.data?.error?.message || e.message || "Unexpected error";
       throw new Error(message);
     }
   }

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import WelcomePage from "./components/home/WelcomePage";
 import HomePage from "./components/home/HomePage";
 import NavBar from "./components/NavBar";
@@ -37,46 +36,39 @@ const App = () => {
   const [currentUser, setCurrentUser] = useState();
   const [isInitializing, setIsInitializing] = useState(true);
 
-  const checkUserLoggedIn = async (userToken) => {
-    // first, try to find token
-    if (userToken) {
-      // if found token, parse token to find id
-      const { id } = jwtDecode(userToken);
-      // if id is found, make an api call to find user record
-      BaseAPI.token = userToken;
-      try {
-        const user = await UsersAPI.get(id);
-        // store user in the state
-        setCurrentUser(user);
-      } catch (e) {
-        // if failed to initialize - ignore
-        BaseAPI.token = null;
-      }
-    }
+  const onAuthSuccess = (user, token) => {
+    BaseAPI.token = token;
+    setCurrentUser(user);
     setIsInitializing(false);
   };
 
-  const login = async (userToken) => {
-    await checkUserLoggedIn(userToken);
-    window.localStorage.setItem("token", userToken);
+  const authenticateUser = async () => {
+    const authRes = await UsersAPI.authenticate();
+    if (!authRes?.token) {
+      setIsInitializing(false);
+      return;
+    }
+    const { user, token } = authRes;
+    onAuthSuccess(user, token);
   };
 
-  const logout = () => {
-    window.localStorage.removeItem("token");
+  const logout = async () => {
+    await UsersAPI.logout();
+    BaseAPI.token = null;
     setCurrentUser();
   };
 
-  // when on the website, check if user is already logged in
+  // App.js never re-renders, so this effect only runs once on mount
   useEffect(() => {
-    const userToken = window.localStorage.getItem("token");
-    checkUserLoggedIn(userToken);
+    authenticateUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div className="App">
       <BrowserRouter>
         <Context.Provider value={{ currentUser, setCurrentUser }}>
-          <NavBar logout={logout} />
+          <NavBar isInitializing={isInitializing} logout={logout} />
           {isInitializing && <Loader />}
           {!isInitializing && (
             <div>
@@ -163,8 +155,8 @@ const App = () => {
                   path="/saved"
                   element={<ProtectedRoute element={<Saves />} />}
                 />
-                <Route path="/login" element={<Login login={login} />} />
-                <Route path="/signup" element={<Signup login={login} />} />
+                <Route path="/login" element={<Login onAuthSuccess={onAuthSuccess} />} />
+                <Route path="/signup" element={<Signup onAuthSuccess={onAuthSuccess} />} />
                 <Route path="*" element={<div>404: Page Not Found</div>} />
               </Routes>
             </div>

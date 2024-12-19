@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import UsersAPI from "../../api/UsersAPI";
 import { Form, Button, Col, FormGroup, Input, Label } from "reactstrap";
 
-const Login = ({ login }) => {
+const Login = ({ onAuthSuccess }) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -21,8 +21,8 @@ const Login = ({ login }) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const token = await UsersAPI.authenticate(formData);
-      await login(token);
+      const { user, token} = await UsersAPI.login(formData);
+      onAuthSuccess(user, token);
       navigate("/");
     } catch (e) {
       setError(e?.message || "Failed to login in");
@@ -49,6 +49,7 @@ const Login = ({ login }) => {
               name="email"
               placeholder="example@email.com"
               type="email"
+              value={formData.email}
               onChange={handleChange}
             />
           </Col>
@@ -63,6 +64,7 @@ const Login = ({ login }) => {
               name="password"
               placeholder="********"
               type="password"
+              value={formData.password}
               onChange={handleChange}
             />
           </Col>

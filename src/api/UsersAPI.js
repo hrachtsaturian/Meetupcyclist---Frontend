@@ -5,13 +5,29 @@ import BaseAPI from "./BaseAPI";
  *
  */
 class UsersAPI extends BaseAPI {
-  static async authenticate(creds) {
+  static async authenticate() {
+    const res = await this.request({
+      path: `authenticate`,
+      method: "post",
+      withCredentials: true,
+    });
+    return res.data;
+  }
+
+  static async login(creds) {
     const res = await this.request({
       path: `login`,
       data: creds,
       method: "post",
     });
     return res.data;
+  }
+
+  static async logout() {
+    await this.request({
+      path: `logout`,
+      method: "post",
+    });
   }
 
   static async signup(creds) {
