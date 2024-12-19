@@ -44,6 +44,8 @@ Check out the live demo: MeetupCyclist on Render
 
 https://meetupcyclist.onrender.com/
 
+* May take up to a minute on initial load
+
 ### Project Breakdown
 #### Database Models
 - Users: Represents registered users
