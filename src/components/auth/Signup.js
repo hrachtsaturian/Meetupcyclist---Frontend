@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UsersAPI from "../../api/UsersAPI";
 import { Form, Button, Col, FormGroup, Input, Label } from "reactstrap";
-import { uploadImage } from "../../helpers/helpers";
 
 const Signup = ({ onAuthSuccess }) => {
   const [formData, setFormData] = useState({
@@ -33,10 +32,6 @@ const Signup = ({ onAuthSuccess }) => {
       setError(e?.message || "Failed to sign up");
     }
     setIsSubmitting(false);
-  };
-
-  const handleUploadImage = async (e) => {
-    await uploadImage(e, setFormData, setError);
   };
 
   return (
@@ -105,19 +100,6 @@ const Signup = ({ onAuthSuccess }) => {
               type="password"
               value={formData.password}
               onChange={handleChange}
-            />
-          </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Label for="examplePfpUrl" sm={2}>
-            Profile Photo
-          </Label>
-          <Col sm={10}>
-            <Input
-              id="imageFile"
-              name="imageFile"
-              type="file"
-              onChange={handleUploadImage}
             />
           </Col>
         </FormGroup>

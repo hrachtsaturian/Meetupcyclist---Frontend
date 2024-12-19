@@ -27,16 +27,6 @@ class BaseAPI {
         headers,
         withCredentials: true,
       });
-      if (axiosRes.data.redirect) {
-        if (
-          window.location.pathname !== axiosRes.data.redirect &&
-          window.location.pathname !== "/signup" &&
-          window.location.pathname !== "/login"
-        ) {
-          window.location.href = axiosRes.data.redirect;
-        }
-        return {};
-      }
       return axiosRes.data;
     } catch (e) {
       console.error("API Error:", e?.response);

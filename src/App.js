@@ -39,7 +39,6 @@ const App = () => {
   const onAuthSuccess = (user, token) => {
     BaseAPI.token = token;
     setCurrentUser(user);
-    setIsInitializing(false);
   };
 
   const authenticateUser = async () => {
@@ -50,6 +49,7 @@ const App = () => {
     }
     const { user, token } = authRes;
     onAuthSuccess(user, token);
+    setIsInitializing(false);
   };
 
   const logout = async () => {
