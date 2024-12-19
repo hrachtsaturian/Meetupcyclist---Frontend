@@ -13,9 +13,9 @@ Users can save events, groups, and locations to their profiles for easy access. 
 ### Tech Stack
 #### Front End
 - Frameworks
- - React.js
+  - React.js
 - Main Libraries
- - Reactstrap
+  - Reactstrap
 #### Back End
 - Frameworks
   - Express.js
@@ -82,11 +82,34 @@ https://meetupcyclist.onrender.com/
   
 #### Functionality Features
 - User Authentication/Authorization: Signup and login functionality.
-- Events - creating, editing data/deleting, attending/unattending events, leaving posts.
-- Groups - creating, editing data/deleting, joining/leaving groups, creating group events or ability to link existing events, leaving posts.
-- Locations - only admins permitted to implement Create, Update, Delete while any user can leave reviews and rating.
-- Profile functionality: viewing user's upcoming/past events, joined groups, as well as bookmarked events, groups, and locations
-- Admin authorization - website admin is able to delete any event, group, location, post, review, as well as deactivate user's account
+- Events
+  - any logged in user can view any existing event
+  - any logged in user can create/edit/delete their event
+  - any logged in user can attend and unattend any event
+  - any logged in user can create/edit/delete their posts in the feed for any event
+  - only event owner can delete other user's posts under their event
+- Groups
+  - any logged in user can view any existing group
+  - any logged in user can create/edit/delete their own group
+  - any logged in user can join and leave any group, except their own group
+  - any logged in user can create/edit/delete their posts in the feed for any group
+  - only group owner can delete other user's posts under their group
+  - only group owner can link an event, and only an event created by the group owner
+- Locations
+  - any logged in user can view any existing location
+  - any logged in user can leave a review(s) for any existing locations
+  - only admins can create/edit/delete location
+  - only admins can delete other user's reviews
+- Profile functionality
+  - any logged in user can view any existing user profile with created groups and upcoming events
+  - any logged in user can edit their own profile information
+  - only admins can permanently deactivate any existing user except other admins or themselves
+- Saved
+  - any logged in user can save and unsave any existing event, group, location and view them on a separate page
+- My events
+  - any logged in user can view their upcoming and previously attended events
+- My groups
+  - any logged in user can view their joined groups on a separate page
 
 #### How to run locally
 1. Set up database 
