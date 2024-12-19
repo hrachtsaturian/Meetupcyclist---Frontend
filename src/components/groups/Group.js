@@ -409,7 +409,7 @@ const Group = () => {
                         <CardText>
                           Attendees: {groupEvent.attendeesCount}
                         </CardText>
-                        {(sameUser || isAdmin) && (
+                        {sameUser && (
                           <Button
                             color="warning"
                             onClick={(e) => {
